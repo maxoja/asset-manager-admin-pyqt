@@ -1,5 +1,9 @@
 # asset-manager-admin-pyqt
 
+# LoginDialog
+- setVerification
+- return Accepted when verification success 
+
 ## todo
 - integrate qtmodern theme
 - create widget for display list of admins/creators (reuse)
