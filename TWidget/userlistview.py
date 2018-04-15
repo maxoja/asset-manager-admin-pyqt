@@ -1,6 +1,7 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QLabel
-from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
+from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QLabel, QMessageBox
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from PyQt5.QtCore import Qt
+
 
 class UserListView(QWidget):
     def __init__(self, titleText='User List View', parent=None):
@@ -13,6 +14,8 @@ class UserListView(QWidget):
         layout.addWidget(self.title)
         layout.addWidget(self.table)
 
+        self.setOnSelectUser(self._defaultSelect)
+
     def setTitle(self, text):
         self.title.setText(text)
 
@@ -23,7 +26,10 @@ class UserListView(QWidget):
         self.table.removeUser(key, value)
 
     def setOnSelectUser(self, onSelect):
-        pass
+        self.table.setOnSelectUser(onSelect)
+
+    def _defaultSelect(self, userDict):
+        print(userDict)
 
 
 class UserListTitle(QLabel):
@@ -40,10 +46,25 @@ class UserListTable(QTableWidget):
         self.keys = ['username', 'password']
         self.setHorizontalHeaderLabels(self.keys)
         self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.itemClicked.connect(self._onClickCell)
+        self.setOnSelectUser(self._defaultOnSelectUser)
 
         header = self.horizontalHeader()
         for i in range(len(self.keys)):
             header.setSectionResizeMode(i, QHeaderView.Stretch)
+
+    def _onClickCell(self, clickedItem):
+        result = dict()
+        for i in range(self.columnCount()):
+            result[self.keys[i]] = self.item(clickedItem.row(), i).text()
+
+        self.onSelectUser(result)
+
+    def _defaultOnSelectUser(self, userDict):
+        print(userDict)
+
+    def setOnSelectUser(self, onSelectUser):
+        self.onSelectUser = onSelectUser
 
     def addUser(self, userDict):
         self.setRowCount(self.rowCount()+1)
@@ -94,6 +115,7 @@ if __name__ == '__main__':
         'username': 'guy',
         'password': 'genius'})
 
+    widget.setOnSelectUser(lambda userDict: QMessageBox.warning(None, 'selected user', str(userDict)))
     #remove users
     widget.removeUser('password', '123456')
 

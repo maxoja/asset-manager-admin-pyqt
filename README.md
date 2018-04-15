@@ -16,6 +16,7 @@
 - setTitle( text:str )
 - addUser( user:dict )
 - removeUser( key:str, value:str )
+- setOnSelectUser( onSelect:func )
 
 ## references and stuff
 - https://github.com/gmarull/qtmodern
