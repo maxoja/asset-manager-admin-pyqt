@@ -1,6 +1,8 @@
 # asset-manager-admin-pyqt
 
 ## todo
+- userview onclick item callback binding
+- userview try qtmodern skin
 - create widget for display list of admins/creators (reuse)
 - create right hand side form to edit user details
 - fetch delay transition
