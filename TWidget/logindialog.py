@@ -12,7 +12,7 @@ class LoginDialog(QDialog):
         self.textPass = QLineEdit(self)
 
         self.buttonLogin = QPushButton('Authenticate')
-        self.buttonLogin.clicked.connect(self.handleLogin)
+        self.buttonLogin.clicked.connect(self.__handleLogin)
 
         layout = QVBoxLayout(self)
         form = QFormLayout()
@@ -27,7 +27,7 @@ class LoginDialog(QDialog):
     def setVerification(self, verification):
         self.verification = verification
 
-    def handleLogin(self):
+    def __handleLogin(self):
         if self.verification(self.textName.text(), self.textPass.text()):
             self.accept()
         else:
