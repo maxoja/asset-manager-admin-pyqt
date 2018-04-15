@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QPushButton
-from PyQt5.QtWidgets import QVBoxLayout, QMessageBox, QWidget, QFormLayout
-
+from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QPushButton, QLabel, QDesktopWidget
+from PyQt5.QtWidgets import QVBoxLayout, QMessageBox, QWidget, QFormLayout, QLayout
+from PyQt5.QtCore import Qt, QPoint
 
 class LoginDialog(QDialog):
     def __init__(self, parent=None):
@@ -8,6 +8,8 @@ class LoginDialog(QDialog):
         self.setWindowTitle("Asset Manager Admin Login")
         self.setFixedWidth(300)
         self.setMaximumHeight(150)
+        centerPoint = QDesktopWidget().availableGeometry().center()
+        self.move(centerPoint.x()-self.width()/2, centerPoint.y()-self.height()/2)
 
         self.verification = lambda user, password: user == '' and password == ''
 
@@ -35,7 +37,32 @@ class LoginDialog(QDialog):
             self.accept()
             self.close()
         else:
-            QMessageBox.warning(self, 'Error', 'Invalid username or password')
+            warningDialog = InvalidDialog()
+            mwarning = windows.ModernWindow(warningDialog)
+            mwarning.show()
+            warningDialog.exec_()
+
+class InvalidDialog(QDialog):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setWindowTitle("Auth Error")
+        self.setFixedSize(180, 70)
+        centerPoint = QDesktopWidget().availableGeometry().center()
+        self.move(centerPoint.x()+250-self.width()/2, centerPoint.y()-self.height()/2)
+
+        self.warningLabel = QLabel('Invalid username or password')
+        self.okButton = QPushButton('Ok')
+        self.okButton.clicked.connect(self.onClick)
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.warningLabel)
+        layout.addWidget(self.okButton)
+        layout.setAlignment(Qt.AlignCenter)
+
+    def onClick(self):
+        self.accept()
+        self.close()
+
 
 if __name__ == '__main__':
     import sys
