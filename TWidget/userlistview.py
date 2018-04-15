@@ -94,7 +94,10 @@ class UserListTable(QTableWidget):
 
 if __name__ == '__main__':
     import sys
+    from qtmodern import styles, windows
+
     app = QApplication(sys.argv)
+    styles.dark(app)
 
     widget = UserListView()
 
@@ -119,5 +122,7 @@ if __name__ == '__main__':
     #remove users
     widget.removeUser('password', '123456')
 
+    # modern = windows.ModernWindow(widget)
+    # modern.show()
     widget.show()
     sys.exit(app.exec_())
