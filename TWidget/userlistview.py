@@ -1,5 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QLabel, QTableWidget, QTableWidgetItem, QHeaderView
-
+from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QLabel
+from PyQt5.QtWidgets import  QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
+from PyQt5.QtCore import Qt
 
 class UserListView(QWidget):
     def __init__(self, titleText='User List View', parent=None):
@@ -21,6 +22,9 @@ class UserListView(QWidget):
     def removeUser(self, key, value):
         self.table.removeUser(key, value)
 
+    def setOnSelectUser(self, onSelect):
+        pass
+
 
 class UserListTitle(QLabel):
     def __init__(self, text, parent=None):
@@ -30,9 +34,12 @@ class UserListTitle(QLabel):
 class UserListTable(QTableWidget):
     def __init__(self):
         super(UserListTable, self).__init__()
+        # self.setSelectionMode(QAbstractItemView.NoSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setColumnCount(2)
         self.keys = ['username', 'password']
         self.setHorizontalHeaderLabels(self.keys)
+        self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
 
         header = self.horizontalHeader()
         for i in range(len(self.keys)):
@@ -43,7 +50,9 @@ class UserListTable(QTableWidget):
         latestRowIndex = self.rowCount()-1
 
         for i, key in zip(range(2),['username', 'password']):
-            self.setItem(latestRowIndex, i, QTableWidgetItem(userDict[key]))
+            item = QTableWidgetItem(userDict[key])
+            item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+            self.setItem(latestRowIndex, i, item)
 
     def removeUser(self, key, value):
         keyIndex = self.keys.index(key)
