@@ -33,9 +33,9 @@ class LoginDialog(QDialog):
     def __handleLogin(self):
         if self.verification(self.textName.text(), self.textPass.text()):
             self.accept()
+            self.close()
         else:
             QMessageBox.warning(self, 'Error', 'Invalid username or password')
-
 
 if __name__ == '__main__':
     import sys
