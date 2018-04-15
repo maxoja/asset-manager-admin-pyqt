@@ -10,5 +10,10 @@
 - customized warning dialogue when authentication has failed
 - return Accepted when verification success 
 
+## UserListView
+- setTitle( text:str )
+- addUser( user:dict )
+- removeUser( key:str, value:str )
+
 ## references and stuff
 - https://github.com/gmarull/qtmodern
