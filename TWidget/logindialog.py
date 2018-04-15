@@ -1,10 +1,13 @@
-from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QPushButton, QVBoxLayout, QMessageBox, QWidget, QFormLayout
+from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QVBoxLayout, QMessageBox, QWidget, QFormLayout
+
 
 class LoginDialog(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
-        self.setWindowTitle("Admin Login")
-        self.setMinimumWidth(300)
+        self.setWindowTitle("Asset Manager Admin Login")
+        self.setFixedWidth(300)
+        self.setMaximumHeight(150)
 
         self.verification = lambda user, password: user == '' and password == ''
 
@@ -36,14 +39,18 @@ class LoginDialog(QDialog):
 
 if __name__ == '__main__':
     import sys
+    from qtmodern import styles, windows
+
     app = QApplication(sys.argv)
+    styles.dark(app)
 
     def verification(u, p):
         return u == 'tawan' and p == 'tham'
 
     dialog = LoginDialog()
     dialog.setVerification(verification)
-    dialog.show()
+    mdialog = windows.ModernWindow(dialog)
+    mdialog.show()
     loginResult = dialog.exec_()
 
     if loginResult != QDialog.Accepted:
