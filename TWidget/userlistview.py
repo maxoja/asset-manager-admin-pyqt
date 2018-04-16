@@ -18,7 +18,10 @@ class UserListView(QWidget):
 
         self.setOnSelectUser(self._defaultSelect)
 
-    def setTitle(self, text):
+    def setIcon(self, iconPath):
+        self.title.setIcon(iconPath)
+
+    def setTitleText(self, text):
         self.title.setText(text)
 
     def addUser(self, userDict):
@@ -55,6 +58,9 @@ class UserListTitle(QWidget):
         pixmap = QPixmap(path)
         pixmap = pixmap.scaledToHeight(self.iconSize)
         self.iconWidget.setPixmap(pixmap)
+
+    def setText(self, text):
+        self.label.setText(text)
 
 
 class UserListTable(QTableWidget):
@@ -119,7 +125,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     styles.dark(app)
 
-    widget = UserListView(iconPath='img/admin-icon.png')
+    widget = UserListView()
+    widget.setIcon('img/admin-icon.png')
 
     #add users
     widget.addUser({

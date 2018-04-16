@@ -12,6 +12,7 @@
 
 ## UserListView
 - setTitle( text:str )
+- setIcon( iconPath:str )
 - addUser( user:dict )
 - removeUser( key:str, value:str )
 - setOnSelectUser( onSelect:func )
