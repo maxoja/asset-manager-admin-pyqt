@@ -18,3 +18,5 @@
 
 ## references and stuff
 - https://github.com/gmarull/qtmodern
+- http://www.freepik.com
+- https://www.flaticon.com

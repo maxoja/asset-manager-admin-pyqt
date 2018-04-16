@@ -1,13 +1,15 @@
-from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QLabel, QMessageBox
+from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QLabel, QMessageBox, QLayout
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
 
 class UserListView(QWidget):
-    def __init__(self, titleText='User List View', parent=None):
+    def __init__(self, titleText='User List View', iconPath='', parent=None):
         QWidget.__init__(self, parent)
 
         self.title = UserListTitle(titleText)
+        self.title.setIcon(iconPath)
         self.table = UserListTable()
 
         layout = QVBoxLayout(self)
@@ -32,9 +34,27 @@ class UserListView(QWidget):
         print(userDict)
 
 
-class UserListTitle(QLabel):
-    def __init__(self, text, parent=None):
-        super(UserListTitle, self).__init__(text, parent)
+class UserListTitle(QWidget):
+    def __init__(self, text, iconSize=26, parent=None):
+        super(UserListTitle, self).__init__(parent)
+
+        self.iconSize = iconSize
+        self.iconWidget = QLabel()
+        self.label = QLabel(text)
+
+        layout = QHBoxLayout(self)
+        layout.addWidget(self.iconWidget)
+        layout.addWidget(self.label)
+        layout.setAlignment(Qt.AlignLeft)
+        layout.setContentsMargins(iconSize/3, 0, 0, 0)
+
+    def setIcon(self, path):
+        if path == '' or path == None:
+            return
+
+        pixmap = QPixmap(path)
+        pixmap = pixmap.scaledToHeight(self.iconSize)
+        self.iconWidget.setPixmap(pixmap)
 
 
 class UserListTable(QTableWidget):
@@ -99,7 +119,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     styles.dark(app)
 
-    widget = UserListView()
+    widget = UserListView(iconPath='img/admin-icon.png')
 
     #add users
     widget.addUser({
@@ -118,11 +138,14 @@ if __name__ == '__main__':
         'username': 'guy',
         'password': 'genius'})
 
-    widget.setOnSelectUser(lambda userDict: QMessageBox.warning(None, 'selected user', str(userDict)))
     #remove users
     widget.removeUser('password', '123456')
 
+    widget.setOnSelectUser(lambda userDict: QMessageBox.warning(None, 'selected user', str(userDict)))
+
+    #change native window component appearance
     # modern = windows.ModernWindow(widget)
     # modern.show()
+
     widget.show()
     sys.exit(app.exec_())
