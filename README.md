@@ -1,9 +1,9 @@
 # asset-manager-admin-pyqt
 
 ## todo
-- create widget for display list of admins/creators (reusable)
 - create right hand side form to edit user details
 - fetch delay transition
+- put things together
 
 ## LoginDialog
 - setVerification
