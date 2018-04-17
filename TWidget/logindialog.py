@@ -15,6 +15,7 @@ class LoginDialog(QDialog):
 
         self.textName = QLineEdit(self)
         self.textPass = QLineEdit(self)
+        self.textPass.setEchoMode(QLineEdit.Password)
 
         self.buttonLogin = QPushButton('Authenticate')
         self.buttonLogin.clicked.connect(self.__handleLogin)
