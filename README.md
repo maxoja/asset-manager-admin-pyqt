@@ -1,6 +1,7 @@
 # asset-manager-admin-pyqt
 
 ## todo
+- mask password field
 - create right hand side form to edit user details
 - fetch delay transition
 - put things together
