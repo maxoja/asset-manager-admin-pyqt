@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 class EditPanel(QWidget):
     def __init__(self, parent=None):
         super(EditPanel, self).__init__(parent)
+        self.additionalData = None
 
         self.updateButton = QPushButton('Update')
         self.updateButton.setMinimumHeight(50)
@@ -32,6 +33,12 @@ class EditPanel(QWidget):
 
     def getEditValueDict(self):
         return self.editFrame.getEditValueDict()
+
+    def setAdditionalData(self, data):
+        self.additionalData = data
+
+    def getAdditionalData(self):
+        return self.additionalData
 
 
 class EditFrame(QFrame):

@@ -1,9 +1,15 @@
 # asset-manager-admin-pyqt
 
 ## todo
+- callback attachable to EditPanel for UPDATE & DELETE
 - create right hand side form to edit user details
 - fetch delay transition
 - put things together
+
+## EditPanel
+- addEditRow( key:str, widgetType:class )
+- getEditValue( key:str )
+- getEditValueDict()
 
 ## LoginDialog
 - setVerification
