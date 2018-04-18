@@ -1,10 +1,9 @@
 # asset-manager-admin-pyqt
 
 ## todo
-- callback attachable to EditPanel for UPDATE & DELETE
-- create right hand side form to edit user details
 - fetch delay transition
 - put things together
+- add title on EditPanel
 
 ## EditPanel
 - addEditRow( key:str, widgetType:class )
@@ -22,6 +21,8 @@
 - addUser( user:dict )
 - removeUser( key:str, value:str )
 - setOnSelectUser( onSelect:func )
+- setOnClickUpdate( onClick:func(dict, data) )
+- setOnClickDelete( onClick:func(dict, data) )
 
 ## references and stuff
 - https://github.com/gmarull/qtmodern
