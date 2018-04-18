@@ -1,31 +1,67 @@
-from PyQt5.QtWidgets import QFrame, QWidget, QVBoxLayout, QTextEdit
-from PyQt5.QtWidgets import QFormLayout, QPushButton, QLayout, QBoxLayout, QLineEdit, QHBoxLayout
+from PyQt5.QtWidgets import QFrame, QWidget, QVBoxLayout, QTextEdit, QLabel
+from PyQt5.QtWidgets import QFormLayout, QPushButton, QLineEdit, QHBoxLayout
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
+
+class UserListTitle(QWidget):
+    def __init__(self, text, iconSize=26, parent=None):
+        super(UserListTitle, self).__init__(parent)
+
+        self.iconSize = iconSize
+        self.iconWidget = QLabel()
+        self.label = QLabel(text)
+
+        layout = QHBoxLayout(self)
+        layout.addWidget(self.iconWidget)
+        layout.addWidget(self.label)
+        layout.setAlignment(Qt.AlignLeft)
+        layout.setContentsMargins(iconSize/3, 0, 0, 0)
+
+    def setIcon(self, path):
+        if path == '' or path == None:
+            return
+
+        pixmap = QPixmap(path)
+        pixmap = pixmap.scaledToHeight(self.iconSize)
+        self.iconWidget.setPixmap(pixmap)
+
+    def setText(self, text):
+        self.label.setText(text)
 
 class EditPanel(QWidget):
     def __init__(self, parent=None):
         super(EditPanel, self).__init__(parent)
         self.additionalData = None
 
+        self.title = UserListTitle("Edit Panel")
+        self.title.setIcon("img/edit-icon.png")
+
         self.updateButton = QPushButton('Update')
         self.updateButton.setMinimumHeight(50)
         self.updateButton.clicked.connect(self.__onClickUpdate)
         self.onClickUpdate = self.__defaultOnClick
 
+        self.newButton = QPushButton('New')
+        self.newButton.clicked.connect(self.__onClickNew)
+        self.onClickNew = self.__defaultOnClick
+
         self.deleteButton = QPushButton('Delete')
         self.deleteButton.setStyleSheet('background-color:"red"; color:"white"')
         self.deleteButton.clicked.connect(self.__onClickDelete)
         self.onClickDelete = self.__defaultOnClick
-        deleteLayout = QHBoxLayout()
-        deleteLayout.addStretch()
-        deleteLayout.addWidget(self.deleteButton)
+
+        buttonBoxLayout = QHBoxLayout()
+        buttonBoxLayout.addStretch()
+        buttonBoxLayout.addWidget(self.newButton)
+        buttonBoxLayout.addWidget(self.deleteButton)
 
         self.editFrame = EditFrame()
-        self.editFrame.layout().addLayout(deleteLayout)
+        self.editFrame.layout().addLayout(buttonBoxLayout)
 
         layout = QVBoxLayout(self)
         layout.setSpacing(15)
+        layout.addWidget(self.title)
         layout.addWidget(self.editFrame)
         layout.addWidget(self.updateButton)
 
@@ -49,6 +85,12 @@ class EditPanel(QWidget):
 
     def setOnClickDelete(self, onClick):
         self.onClickDelete = onClick
+
+    def setOnClickNew(self, onClick):
+        self.onClickNew = onClick
+
+    def __onClickNew(self):
+        self.onClickNew(self.editFrame.getEditValueDict(), self.additionalData)
 
     def __onClickUpdate(self):
         self.onClickUpdate(self.editFrame.getEditValueDict(), self.additionalData)
