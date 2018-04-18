@@ -10,9 +10,13 @@ class EditPanel(QWidget):
 
         self.updateButton = QPushButton('Update')
         self.updateButton.setMinimumHeight(50)
+        self.updateButton.clicked.connect(self.__onClickUpdate)
+        self.onClickUpdate = self.__defaultOnClick
 
         self.deleteButton = QPushButton('Delete')
         self.deleteButton.setStyleSheet('background-color:"red"; color:"white"')
+        self.deleteButton.clicked.connect(self.__onClickDelete)
+        self.onClickDelete = self.__defaultOnClick
         deleteLayout = QHBoxLayout()
         deleteLayout.addStretch()
         deleteLayout.addWidget(self.deleteButton)
@@ -40,6 +44,21 @@ class EditPanel(QWidget):
     def getAdditionalData(self):
         return self.additionalData
 
+    def setOnClickUpdate(self, onClick):
+        self.onClickUpdate = onClick
+
+    def setOnClickDelete(self, onClick):
+        self.onClickDelete = onClick
+
+    def __onClickUpdate(self):
+        self.onClickUpdate(self.editFrame.getEditValueDict(), self.additionalData)
+
+    def __onClickDelete(self):
+        self.onClickDelete(self.editFrame.getEditValueDict(), self.additionalData)
+
+    def __defaultOnClick(self, dictValues, additionalData):
+        print(dictValues, additionalData)
+
 
 class EditFrame(QFrame):
     def __init__(self, parent=None):
@@ -49,7 +68,6 @@ class EditFrame(QFrame):
         self.editWidgets = dict()
 
         self.form = QFormLayout()
-        self.form.addRow('Employment ID', QLineEdit())
 
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
@@ -63,10 +81,15 @@ class EditFrame(QFrame):
         self.form.addRow(key, widget)
 
     def getEditValue(self, key):
-        return self.editWidgets[key].text()
+        widget = self.editWidgets[key]
+        if isinstance(widget, QLineEdit):
+            return widget.text()
+        else:
+            return widget.toPlainText()
 
     def getEditValueDict(self):
         return {key: self.getEditValue(key) for key in self.editWidgets}
+
 
 if __name__ == '__main__':
     import sys
