@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt, QPoint
 from qtmodern import styles, windows
 from TConnect import connector
 
+
 class LoginDialog(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
@@ -12,8 +13,6 @@ class LoginDialog(QDialog):
         self.setMaximumHeight(150)
         centerPoint = QDesktopWidget().availableGeometry().center()
         self.move(centerPoint.x()-self.width()/2, centerPoint.y()-self.height()/2)
-
-        self.verification = lambda user, password: user == '' and password == ''
 
         self.textName = QLineEdit(self)
         self.textPass = QLineEdit(self)
@@ -31,9 +30,6 @@ class LoginDialog(QDialog):
         layout.addWidget(self.buttonLogin)
         layout.setSpacing(20)
         layout.setContentsMargins(20, 20, 20, 20)
-
-    def setVerification(self, verification):
-        self.verification = verification
 
     def __handleLogin(self):
         def onsuccess():
@@ -108,11 +104,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     styles.dark(app)
 
-    def verification(u, p):
-        return u == 'tawan' and p == 'tham'
-
     dialog = LoginDialog()
-    dialog.setVerification(verification)
     mdialog = windows.ModernWindow(dialog)
     mdialog.show()
     loginResult = dialog.exec_()
