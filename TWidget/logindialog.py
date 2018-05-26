@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QPushButton, QLabel, QDesktopWidget
 from PyQt5.QtWidgets import QVBoxLayout, QMessageBox, QWidget, QFormLayout, QLayout
 from PyQt5.QtCore import Qt, QPoint
+from qtmodern import styles, windows
 
 class LoginDialog(QDialog):
     def __init__(self, parent=None):
