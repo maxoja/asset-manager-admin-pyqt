@@ -1,9 +1,14 @@
 # asset-manager-admin-pyqt
 
 ## todo
-- create right hand side form to edit user details
+- center screen windows
 - fetch delay transition
 - put things together
+
+## EditPanel
+- addEditRow( key:str, widgetType:class )
+- getEditValue( key:str )
+- getEditValueDict()
 
 ## LoginDialog
 - setVerification
@@ -16,6 +21,8 @@
 - addUser( user:dict )
 - removeUser( key:str, value:str )
 - setOnSelectUser( onSelect:func )
+- setOnClickUpdate( onClick:func(dict, data) )
+- setOnClickDelete( onClick:func(dict, data) )
 
 ## references and stuff
 - https://github.com/gmarull/qtmodern
