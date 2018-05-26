@@ -21,7 +21,7 @@ class ManageUserWindow(QWidget):
         self.creatorListView.setIcon("img/artist-icon.png")
 
         self.editPanel = EditPanel()
-        self.editPanel.setFixedWidth(270)
+        self.editPanel.setFixedWidth(300)
         self.editPanel.addEditRow('Employment ID', QLineEdit)
         self.editPanel.addEditRow('Display Name', QLineEdit)
         self.editPanel.addEditRow('Username', QLineEdit)
@@ -39,6 +39,11 @@ class ManageUserWindow(QWidget):
         layout.addWidget(self.editPanel)
         # layout.addWidget(self.adminListView)
         # layout.addWidget(self.creatorListView)
+
+        self.__initialize()
+
+    def __initialize(self):
+        pass
 
 
 def verification(u, p):
