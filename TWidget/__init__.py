@@ -5,3 +5,4 @@ from .usereditpanel import EditPanel
 from .droparrow import DropDownArrow
 from .hierarchpanel import HierarchyPanel
 from .stepperwidget import StepperWidget
+from .commentpanel import CommentPanel

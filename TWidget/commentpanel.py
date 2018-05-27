@@ -46,7 +46,10 @@ class CommentPanel(QWidget):
         self.comments = []
         self.onClickComment = self.__defaultOnClickComment
 
+        self.label = QLabel("Comment")
+
         layout = QVBoxLayout(self)
+        layout.addWidget(self.label)
         layout.setSpacing(0)
         layout.addStretch(0)
 
@@ -70,6 +73,12 @@ class CommentPanel(QWidget):
         self.layout().addWidget(newComment)
         self.layout().addStretch(0)
 
+    def clearAll(self):
+        while self.layout().count() > 1:
+            self.layout().removeItem(self.layout().itemAt(self.layout().count()-1))
+
+        self.layout().addStretch(0)
+        self.comments.clear()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -84,9 +93,11 @@ if __name__ == '__main__':
     widget.addComment(title="comment 2", owner="maxoja", time="19:00 2 April")
     widget.addComment(title="comment 3", owner="maxoja", time="19:00 3 April")
     widget.addComment(title="comment 4", owner="maxoja", time="19:00 4 April")
-    widget.addComment(title="comment 5", owner="maxoja", time="19:00 5 April")
-    widget.addComment(title="comment 6", owner="maxoja", time="19:00 6 April")
     widget.setOnClickComment(onClickItem)
     widget.show()
+
+    widget.clearAll()
+    widget.addComment(title="comment 5", owner="maxoja", time="19:00 5 April")
+    widget.addComment(title="comment 6", owner="maxoja", time="19:00 6 April")
 
     sys.exit(app.exec_())

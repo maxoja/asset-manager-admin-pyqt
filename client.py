@@ -1,4 +1,4 @@
-from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget
+from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel
 from TModel import HierarchicalModel
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout
 from PyQt5.QtCore import Qt
@@ -47,7 +47,13 @@ class ManageAssetWindow(QWidget):
         self.hierarchy = HierarchyPanel(tree)
 
         # RIGHT WIDGET
-        self.commentPanel = HierarchyPanel(tree)
+        self.commentPanel = CommentPanel()
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.setMaximumWidth(260)
 
         # MID TOP WIDGET
         self.stepper = StepperWidget(5, checkpointCover=0.7)

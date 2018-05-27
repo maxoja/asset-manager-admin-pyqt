@@ -62,7 +62,7 @@ class ManageUserWindow(QWidget):
             # self.creatorListView.hideLoading()
             print('get creator list error occurred')
 
-        self.creatorListView.showLoading()
+        # self.creatorListView.showLoading()
         connector.getCreatorList(onreceive, onerror)
 
 

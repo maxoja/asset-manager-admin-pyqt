@@ -17,7 +17,9 @@ class LoginDialog(QDialog):
         self.move(centerPoint.x()-self.width()/2, centerPoint.y()-self.height()/2)
 
         self.textName = QLineEdit(self)
+        # self.textName.setMinimumWidth(150)
         self.textPass = QLineEdit(self)
+        # self.textPass.setMinimumWidth(200)
         self.textPass.setEchoMode(QLineEdit.Password)
 
         self.buttonLogin = QPushButton('Authenticate')
@@ -25,6 +27,7 @@ class LoginDialog(QDialog):
 
         layout = QVBoxLayout(self)
         form = QFormLayout()
+        form.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
         form.addRow('Username', self.textName)
         form.addRow('Password', self.textPass)
         form.addWidget(self.buttonLogin)
