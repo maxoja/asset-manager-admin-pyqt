@@ -22,6 +22,9 @@ class StepperCheckpoint(QWidget):
         self.onClick = onClick
         self.primaryText = str(id)
         self.secondaryText = "hello"
+        self.x = 0
+        self.top = self.height()/2 - self.visualSize/2
+        self.left = self.x - self.visualSize/2
 
         self.setMouseTracking(True)
 
@@ -44,13 +47,12 @@ class StepperCheckpoint(QWidget):
         self.x = x
 
     def paintEvent(self, paintEvent):
-        # return
-
         painter = QPainter(self)
         painter.setPen(QPen(Qt.NoPen))
 
-        # painter.setBrush(QBrush(Qt.lightGray))
-        # painter.drawRect(0,0,self.width(), self.height())
+        #DEBUG Bounding Box
+        #painter.setBrush(QBrush(Qt.lightGray))
+        #painter.drawRect(0,0,self.width(), self.height())
 
         if self.state == self.STATE_PASSIVE:
             painter.setBrush(QBrush(QColor(0,200,255,30)))
@@ -59,21 +61,20 @@ class StepperCheckpoint(QWidget):
         elif self.state == self.STATE_CURRENT:
             painter.setBrush(QBrush(QColor(0, 200, 255, 255)))
 
-        top = self.height()/2 - self.visualSize/2
-        left = self.x - self.visualSize/2
+        self.top = self.height()/2 - self.visualSize/2
+        self.left = self.x - self.visualSize/2
 
-        painter.drawPie(left, top, self.visualSize, self.visualSize, 0, 5760*(16*360))
+        painter.drawPie(self.left, self.top, self.visualSize, self.visualSize, 0, 5760*(16*360))
 
         painter.setPen(QPen(QColor(0,0,0)))
-        painter.drawText(QRectF(left, top, self.visualSize, self.visualSize), Qt.AlignCenter, self.primaryText)
-        painter.drawText(QRectF(left-self.visualSize, top+self.visualSize, self.visualSize*3, self.visualSize/2), Qt.AlignCenter, self.secondaryText)
-
+        painter.drawText(QRectF(self.left, self.top, self.visualSize, self.visualSize), Qt.AlignCenter, self.primaryText)
+        painter.drawText(QRectF(self.left-self.visualSize, self.top+self.visualSize, self.visualSize*3, self.visualSize/2), Qt.AlignCenter, self.secondaryText)
 
     def checkMouse(self, mx, my):
-        mid = self.width()/2, self.height()/2
-        lineardist = abs(mx - mid[0]), abs(my - mid[1])
-        dist = (lineardist[0]**2 + lineardist[1]**2)**0.5
-        return dist <= self.visualSize/2
+        if (mx < self.left or mx > self.left + self.visualSize) or (my < self.top or my > self.top + self.visualSize):
+            return False
+        else:
+            return True
 
     def mousePressEvent(self, event):
         if self.checkMouse(event.x(), event.y()):
@@ -81,7 +82,8 @@ class StepperCheckpoint(QWidget):
             self.onClick(self.id)
 
     def mouseMoveEvent(self, event):
-        print(self.checkMouse(event.x(), event.y()))
+        if self.checkMouse(event.x(), event.y()):
+            print("Mouse entered " + str(self.id) + " at (" + str(event.x()) + "," + str(event.y()) + ")")
 
 
 class StepperWidget(QWidget):
