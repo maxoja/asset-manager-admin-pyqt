@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QVBoxLayout, QMessageBox, QWidget, QFormLayout, QLay
 from PyQt5.QtCore import Qt, QPoint
 from qtmodern import styles, windows
 from TConnect import connector
+# from TWidget import LoadingFilter
+
 
 
 class LoginDialog(QDialog):
@@ -31,6 +33,14 @@ class LoginDialog(QDialog):
         layout.setSpacing(20)
         layout.setContentsMargins(20, 20, 20, 20)
 
+        # self.loadingFilter = LoadingFilter(self)
+
+    # def showloading(self):
+    #     self.loadingFilter.show()
+    #
+    # def hideloading(self):
+    #     self.loadingFilter.hide()
+
     def __handleLogin(self):
         def onsuccess():
             print('login success:', connector.getUserID(), connector.getAuthToken())
@@ -39,6 +49,7 @@ class LoginDialog(QDialog):
 
         def onfailed(tag, comment):
             print('login failed:', tag, comment)
+            # self.loadingFilter.hideLoading()
             warningDialog = InvalidDialog()
             mwarning = windows.ModernWindow(warningDialog)
             mwarning.show()
@@ -46,11 +57,13 @@ class LoginDialog(QDialog):
 
         def onerror():
             print('login error')
+            # self.loadingFilter.hideLoading()
             warningDialog = ErrorDialog()
             mwarning = windows.ModernWindow(warningDialog)
             mwarning.show()
             warningDialog.exec_()
 
+        # self.loadingFilter.showLoading()
         connector.login(self.textName.text(), self.textPass.text(), onsuccess, onfailed, onerror)
 
 

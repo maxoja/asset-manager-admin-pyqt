@@ -2,10 +2,11 @@ from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QLa
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
+# from TWidget import LoadingFilter
 
 
 class UserListView(QWidget):
-    def __init__(self, titleText='User List View', keys=['username','password'], iconPath='', parent=None):
+    def __init__(self, titleText='User List View', keys=['username', 'password'], iconPath='', parent=None):
         QWidget.__init__(self, parent)
 
         self.title = UserListTitle(titleText)
@@ -17,6 +18,13 @@ class UserListView(QWidget):
         layout.addWidget(self.table)
 
         self.setOnSelectUser(self._defaultSelect)
+        # self.loadingFilter = LoadingFilter(self)
+
+    # def showLoading(self):
+    #     self.loadingFilter.showLoading()
+    #
+    # def hideLoading(self):
+    #     self.loadingFilter.hideLoading()
 
     def setIcon(self, iconPath):
         self.title.setIcon(iconPath)

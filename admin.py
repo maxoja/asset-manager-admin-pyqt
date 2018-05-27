@@ -52,14 +52,17 @@ class ManageUserWindow(QWidget):
 
     def __initialize(self):
         def onreceive(result):
+            # self.creatorListView.hideLoading()
             for k, v in result.items():
                 v['id'] = k
                 self.creatorListView.addUser(v)
                 print(k, v)
 
         def onerror():
+            # self.creatorListView.hideLoading()
             print('get creator list error occurred')
 
+        self.creatorListView.showLoading()
         connector.getCreatorList(onreceive, onerror)
 
 

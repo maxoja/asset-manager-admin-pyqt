@@ -9,9 +9,11 @@ from TConnect import connector
 class ManageAssetWindow(QWidget):
     def __init__(self):
         super(ManageAssetWindow, self).__init__()
-        self.setWindowTitle("Asset Manager Admin")
+        self.setWindowTitle("Asset Manager Client")
         self.setMinimumWidth(800)
         self.setMinimumHeight(600)
+
+        
 
         self.adminListView = UserListView()
         self.adminListView.setTitleText("Admin User List")
