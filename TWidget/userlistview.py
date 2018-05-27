@@ -2,21 +2,29 @@ from PyQt5.QtWidgets import QWidget, QApplication, QVBoxLayout, QHBoxLayout, QLa
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
+# from TWidget import LoadingFilter
 
 
 class UserListView(QWidget):
-    def __init__(self, titleText='User List View', iconPath='', parent=None):
+    def __init__(self, titleText='User List View', keys=['username', 'password'], iconPath='', parent=None):
         QWidget.__init__(self, parent)
 
         self.title = UserListTitle(titleText)
         self.title.setIcon(iconPath)
-        self.table = UserListTable()
+        self.table = UserListTable(keys)
 
         layout = QVBoxLayout(self)
         layout.addWidget(self.title)
         layout.addWidget(self.table)
 
         self.setOnSelectUser(self._defaultSelect)
+        # self.loadingFilter = LoadingFilter(self)
+
+    # def showLoading(self):
+    #     self.loadingFilter.showLoading()
+    #
+    # def hideLoading(self):
+    #     self.loadingFilter.hideLoading()
 
     def setIcon(self, iconPath):
         self.title.setIcon(iconPath)
@@ -64,12 +72,12 @@ class UserListTitle(QWidget):
 
 
 class UserListTable(QTableWidget):
-    def __init__(self):
+    def __init__(self, keys=['username','password']):
         super(UserListTable, self).__init__()
         # self.setSelectionMode(QAbstractItemView.NoSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.setColumnCount(2)
-        self.keys = ['username', 'password']
+        self.setColumnCount(len(keys))
+        self.keys = keys
         self.setHorizontalHeaderLabels(self.keys)
         self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.itemClicked.connect(self._onClickCell)
@@ -96,7 +104,7 @@ class UserListTable(QTableWidget):
         self.setRowCount(self.rowCount()+1)
         latestRowIndex = self.rowCount()-1
 
-        for i, key in zip(range(2),['username', 'password']):
+        for i, key in zip(range(len(self.keys)), self.keys):
             item = QTableWidgetItem(userDict[key])
             item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             self.setItem(latestRowIndex, i, item)
