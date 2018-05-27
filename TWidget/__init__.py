@@ -6,3 +6,4 @@ from .droparrow import DropDownArrow
 from .hierarchpanel import HierarchyPanel
 from .stepperwidget import StepperWidget
 from .commentpanel import CommentPanel
+from .assetview import AssetViewWidget
