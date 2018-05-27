@@ -1,4 +1,5 @@
-from TWidget import LoginDialog, UserListView, EditPanel
+from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel
+from TModel import HierarchicalModel
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit
 from PyQt5.QtCore import Qt
 from qtmodern import styles, windows
@@ -13,7 +14,36 @@ class ManageAssetWindow(QWidget):
         self.setMinimumWidth(800)
         self.setMinimumHeight(600)
 
+        tree = HierarchicalModel()
+        tree.add(0, name="root") \
+            .add(1, 0, name="3D models", tip="you can set tooltip text\nby passing tip value of item") \
+            .add(2, 1, name="Weapons") \
+            .add(3, 2, name="Guns") \
+            .add(4, 2, name="Melees") \
+            .add(5, 2, name="Bombs") \
+            .add(24, 1, name="Furnitures") \
+            .add(25, 1, name="Instruments") \
+            .add(26, 1, name="Zombies") \
+            .add(6, 1, name="Vehicles") \
+            .add(7, 6, name="Boats") \
+            .add(8, 6, name="Bikes") \
+            .add(9, 1, name="Trees") \
+            .add(10, 0, name="Sprite Sheets") \
+            .add(11, 10, name="Characters") \
+            .add(12, 10, name="Buildings") \
+            .add(13, 10, name="Map-Tiles") \
+            .add(14, 10, name="Buttons") \
+            .add(15, 10, name="Obstacles") \
+            .add(16, 10, name="Magics") \
+            .add(17, 10, name="Bullets&Rockets") \
+            .add(18, 10, name="Lights") \
+            .add(19, 10, name="Effects") \
+            .add(20, 10, name="Titles") \
+            .add(21, 10, name="9-Patches") \
+            .add(22, 10, name="HUD") \
+            .add(23, 10, name="Bars")
 
+        self.hierarchy = HierarchyPanel(tree)
 
         self.adminListView = UserListView()
         self.adminListView.setTitleText("Admin User List")
@@ -36,10 +66,10 @@ class ManageAssetWindow(QWidget):
         # self.splitter.addWidget(self.editPanel)
 
         layout = QHBoxLayout(self)
+        layout.addWidget(self.hierarchy)
         layout.addWidget(self.splitter)
-        layout.addWidget(self.editPanel)
-        # layout.addWidget(self.adminListView)
-        # layout.addWidget(self.creatorListView)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
 
         self.__initialize()
 
@@ -66,18 +96,15 @@ class ManageAssetWindow(QWidget):
 
 
 app = QApplication(sys.argv)
-styles.dark(app)
 
 dialog = LoginDialog()
-mdialog = windows.ModernWindow(dialog)
-mdialog.show()
+dialog.show()
 loginResult = dialog.exec_()
 
 if loginResult != QDialog.Accepted:
     sys.exit(app.exec_())
 
 userwin = ManageAssetWindow()
-_userwin = windows.ModernWindow(userwin)
-_userwin.show()
+userwin.show()
 
 sys.exit(app.exec_())
