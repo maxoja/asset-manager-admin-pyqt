@@ -13,7 +13,7 @@ class ManageAssetWindow(QWidget):
         self.setMinimumWidth(800)
         self.setMinimumHeight(600)
 
-        
+
 
         self.adminListView = UserListView()
         self.adminListView.setTitleText("Admin User List")
