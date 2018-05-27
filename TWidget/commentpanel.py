@@ -13,7 +13,7 @@ class CommentItem(QPushButton):
 
         self.setupRepresentation()
 
-        self.onClick = self.__defaultOnClick
+        self.onClickComment = self.__defaultOnClick
         self.clicked.connect(self.__onClickPlug)
 
     def setupRepresentation(self):
@@ -31,11 +31,18 @@ class CommentItem(QPushButton):
         layout.addStretch()
         layout.addWidget(ownerLabel)
 
-    def setOnClick(self, onClick):
-        self.onClick = onClick
+    def setOnClickComment(self, onClick):
+        self.onClickComment = onClick
 
     def __onClickPlug(self):
-        self.onClick(self.model)
+        # for w in self.parent().children():
+        #     if isinstance(w, CommentItem):
+        #         if w is self:
+        #             w.setDisabled(True)
+        #         else:
+        #             w.setEnabled(True)
+
+        self.onClickComment(self.model)
 
     def __defaultOnClick(self, model):
         print(model)
@@ -60,6 +67,7 @@ class CommentPanel(QWidget):
         self.commentLayout.addStretch(0)
         self.commentLayout.setSizeConstraint(QLayout.SetMinAndMaxSize)
         areawidget.setLayout(self.commentLayout)
+
         self.fieldArea = AddCommentArea()
         scrollarea.setWidget(areawidget)
 
@@ -78,17 +86,20 @@ class CommentPanel(QWidget):
     def __applyOnClickComment(self):
         for comment in self.comments:
             if isinstance(comment, CommentItem):
-                comment.setOnClick(self.onClickComment)
+                comment.setOnClickComment(self.onClickComment)
 
     def setOnClickComment(self, onClick):
         self.onClickComment = onClick
         self.__applyOnClickComment()
 
+    def setOnClickAdd(self, onClick):
+        self.fieldArea.setOnClickAdd(onClick)
+
     def addComment(self, **kwargs):
         layout = self.commentLayout
 
         newComment = CommentItem(**kwargs)
-        newComment.setOnClick(self.onClickComment)
+        newComment.setOnClickComment(self.onClickComment)
         self.comments.append(newComment)
         layout.removeItem(layout.itemAt(layout.count()-1))
         layout.addWidget(newComment)
