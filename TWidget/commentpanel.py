@@ -17,7 +17,8 @@ class CommentItem(QPushButton):
         self.clicked.connect(self.__onClickPlug)
 
     def setupRepresentation(self):
-        layout = QHBoxLayout(self)
+
+        layout = QHBoxLayout()
 
         titleFont = QFont("", 15, QFont.Bold)
         titleLabel = QLabel(self.model['title'])
@@ -31,16 +32,26 @@ class CommentItem(QPushButton):
         layout.addStretch()
         layout.addWidget(ownerLabel)
 
+        outer = QVBoxLayout(self)
+        outer.setAlignment(Qt.AlignTop)
+        outer.addLayout(layout)
+
     def setOnClickComment(self, onClick):
         self.onClickComment = onClick
 
     def __onClickPlug(self):
-        # for w in self.parent().children():
-        #     if isinstance(w, CommentItem):
-        #         if w is self:
-        #             w.setDisabled(True)
-        #         else:
-        #             w.setEnabled(True)
+        for w in self.parent().children():
+            if isinstance(w, CommentItem):
+                if w is self:
+                    w.setMinimumHeight(150)
+                    if w.layout().count() < 2:
+                        label = QLabel(str(self.model))
+                        label.setWordWrap(True)
+                        w.layout().addWidget(label)
+                else:
+                    w.setMinimumHeight(50)
+                    if w.layout().count() > 1:
+                        w.layout().removeItem(w.layout().itemAt(1))
 
         self.onClickComment(self.model)
 
