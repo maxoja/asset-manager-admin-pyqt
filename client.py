@@ -1,6 +1,6 @@
-from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel
+from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget
 from TModel import HierarchicalModel
-from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout
 from PyQt5.QtCore import Qt
 from qtmodern import styles, windows
 import sys
@@ -11,7 +11,7 @@ class ManageAssetWindow(QWidget):
     def __init__(self):
         super(ManageAssetWindow, self).__init__()
         self.setWindowTitle("Asset Manager Client")
-        self.setMinimumWidth(800)
+        self.setMinimumWidth(1000)
         self.setMinimumHeight(600)
 
         tree = HierarchicalModel()
@@ -43,31 +43,46 @@ class ManageAssetWindow(QWidget):
             .add(22, 10, name="HUD") \
             .add(23, 10, name="Bars")
 
+        # LEFT WIDGET
         self.hierarchy = HierarchyPanel(tree)
 
-        self.adminListView = UserListView()
-        self.adminListView.setTitleText("Admin User List")
-        self.adminListView.setIcon("img/admin-icon.png")
-        self.adminListView.setOnSelectUser(self.__onClickAdmin)
+        # RIGHT WIDGET
+        self.commentPanel = HierarchyPanel(tree)
 
-        self.creatorListView = UserListView(keys=['id', 'name', 'email'])
-        self.creatorListView.setTitleText("Creator User List")
-        self.creatorListView.setIcon("img/artist-icon.png")
-        self.creatorListView.setOnSelectUser(self.__onClickCreator)
+        # MID TOP WIDGET
+        self.stepper = StepperWidget(5, checkpointCover=0.7)
+        [self.stepper.setSecondaryText('', i) for i in range(5)]
 
-        self.editPanel = EditPanel()
-        self.editPanel.setFixedWidth(300)
-        self.editPanel.addEditRow('Display Name', QLineEdit)
-        self.editPanel.addEditRow('Email', QLineEdit)
+        # MID MID WIDGET
+        self.assetView = UserListView(keys=['id', 'name', 'email'])
+        self.assetView.setTitleText("Creator User List")
+        self.assetView.setIcon("img/artist-icon.png")
+        self.assetView.setOnSelectUser(self.__onClickCreator)
 
+        # MID BOTTOM WIDGET
+        self.assetOptionPanel = UserListView(keys=['id', 'name', 'email'])
+        self.assetOptionPanel.setTitleText("Creator User List")
+        self.assetOptionPanel.setIcon("img/artist-icon.png")
+        self.assetOptionPanel.setOnSelectUser(self.__onClickCreator)
+
+        # MID LOWER LAYOUT
+        midwidget = QWidget()
+        midlayout = QVBoxLayout()
+        midlayout.addWidget(self.assetView)
+        midlayout.addWidget(self.assetOptionPanel)
+        midlayout.setContentsMargins(0, 0, 0, 0)
+        midwidget.setLayout(midlayout)
+
+        # MID SPLITTER
         self.splitter = QSplitter(Qt.Vertical)
-        self.splitter.addWidget(self.adminListView)
-        self.splitter.addWidget(self.creatorListView)
-        # self.splitter.addWidget(self.editPanel)
+        self.splitter.addWidget(self.stepper)
+        self.splitter.addWidget(midwidget)
 
+        # OUTER LAYOUT
         layout = QHBoxLayout(self)
         layout.addWidget(self.hierarchy)
         layout.addWidget(self.splitter)
+        layout.addWidget(self.commentPanel)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
@@ -86,7 +101,7 @@ class ManageAssetWindow(QWidget):
         def onreceive(result):
             for k, v in result.items():
                 v['id'] = k
-                self.creatorListView.addUser(v)
+                self.assetView.addUser(v)
                 print(k, v)
 
         def onerror():

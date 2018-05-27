@@ -33,6 +33,9 @@ class LoginDialog(QDialog):
         layout.setSpacing(20)
         layout.setContentsMargins(20, 20, 20, 20)
 
+        self.textName.setText("admin")
+        self.textPass.setText("1234")
+        # self.__handleLogin()
         # self.loadingFilter = LoadingFilter(self)
 
     # def showloading(self):
