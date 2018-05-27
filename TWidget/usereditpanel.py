@@ -29,6 +29,7 @@ class UserListTitle(QWidget):
     def setText(self, text):
         self.label.setText(text)
 
+
 class EditPanel(QWidget):
     def __init__(self, parent=None):
         super(EditPanel, self).__init__(parent)
@@ -67,6 +68,9 @@ class EditPanel(QWidget):
 
     def addEditRow(self, key, widgetType):
         self.editFrame.addEditRow(key, widgetType)
+
+    def setEditValue(self, key, value):
+        self.editFrame.setEditValue(key, value)
 
     def getEditValue(self, key):
         return self.editFrame.getEditValue(key)
@@ -128,6 +132,9 @@ class EditFrame(QFrame):
             return widget.text()
         else:
             return widget.toPlainText()
+
+    def setEditValue(self, key, value):
+        self.editWidgets[key].setText(value)
 
     def getEditValueDict(self):
         return {key: self.getEditValue(key) for key in self.editWidgets}
