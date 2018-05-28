@@ -38,6 +38,9 @@ class AssetViewWidget(QtWidgets.QGraphicsView):
                 self.scale(factor, factor)
             self._zoom = 0
 
+    def getCurrentOriginalPixmap(self):
+        return self.originalPixmap
+
     def setPhoto(self, pixmap=None):
         self._zoom = 0
         self.originalPixmap = pixmap
