@@ -3,10 +3,13 @@ class HierarchicalModel:
         self.connection = dict()
         self.itemDict = dict()
         self.unmatched = []
+        self.maxid = 0
 
     def add(self, id, parentId=None, **item):
         assert( 'name' in item )
         assert( id not in self.itemDict )
+        self.maxid = id if self.maxid < id else self.maxid
+
         item['parentId'] = parentId
         self.itemDict[id] = item
         self.connection[id] = []
@@ -31,6 +34,8 @@ class HierarchicalModel:
 
         return self
 
+    def getNextId(self):
+        return self.maxid+1
     def getTree(self, rootId, getIdOnly=False):
         if getIdOnly:
             return rootId, [self.getTree(i, getIdOnly) for i in self.connection[rootId]]
