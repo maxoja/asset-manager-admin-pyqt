@@ -78,12 +78,12 @@ class StepperCheckpoint(QWidget):
 
     def mousePressEvent(self, event):
         if self.checkMouse(event.x(), event.y()):
-            print(self.id)
+            # print(self.id)
             self.onClick(self.id)
 
-    def mouseMoveEvent(self, event):
-        if self.checkMouse(event.x(), event.y()):
-            print("Mouse entered " + str(self.id) + " at (" + str(event.x()) + "," + str(event.y()) + ")")
+    # def mouseMoveEvent(self, event):
+        # if self.checkMouse(event.x(), event.y()):
+            # print("Mouse entered " + str(self.id) + " at (" + str(event.x()) + "," + str(event.y()) + ")")
 
 
 class StepperWidget(QWidget):
@@ -103,10 +103,10 @@ class StepperWidget(QWidget):
 
         self.setMinimumSize(200, 50)
 
-        print('width:', self.width())
-        print('area:', self.checkpointArea)
-        print('visual:', self.checkpointVisualSize)
-        print('bridge:', self.bridgeLength)
+        # print('width:', self.width())
+        # print('area:', self.checkpointArea)
+        # print('visual:', self.checkpointVisualSize)
+        # print('bridge:', self.bridgeLength)
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0,0,0,0)
@@ -123,7 +123,7 @@ class StepperWidget(QWidget):
 
         for i, checkpoint in self.checkpoints.items():
             if i < currentStep:
-                print('---')
+                # print('---')
                 checkpoint.setState(StepperCheckpoint.STATE_ACTIVE)
             elif i == currentStep:
                 checkpoint.setState(StepperCheckpoint.STATE_CURRENT)
@@ -169,11 +169,11 @@ class StepperWidget(QWidget):
         self.__calculateBridgeLength()
         self.__setProperMargin()
 
-        print()
-        print('width:', self.width())
-        print('area:', self.checkpointArea)
-        print('visual:', self.checkpointVisualSize)
-        print('bridge:', self.bridgeLength)
+        # print()
+        # print('width:', self.width())
+        # print('area:', self.checkpointArea)
+        # print('visual:', self.checkpointVisualSize)
+        # print('bridge:', self.bridgeLength)
 
         # for checkpoint in self.checkpoints.values():
         #     checkpoint.setDrawParameters(self.checkpointArea, self
