@@ -1,9 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QHBoxLayout, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QHBoxLayout, QApplication, QLineEdit
 
 
 class AssetOptionPanel(QWidget):
     MODE_NONE = 0
-    MODE_NEW_ASSET = 1
+    MODE_NEW_FOLDER = 1
     MODE_VIEW_ASSET = 2
     MODE_FOLDER = 3
     MODE_CONFIRM_CREATE = 4
@@ -11,6 +11,8 @@ class AssetOptionPanel(QWidget):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
+
+        self.field = QLineEdit()
 
         self.noneLabel = QLabel("please select a folder/an asset")
 
@@ -50,20 +52,30 @@ class AssetOptionPanel(QWidget):
         self.onclicktogglecomment = self.__defaultOnClickToggle
         self.toggleButton.clicked.connect(self.__onClickTogglePlug)
 
+        self.confirmNewFolderButton = QPushButton("Confirm Create New Folder")
+        self.onclickconfirmnewfolder = self.__defaultOnClickConfirmNewFoler
+        self.confirmNewFolderButton.clicked.connect(self.__onClickConfirmNewFolderPlug)
+
         layout = QHBoxLayout(self)
 
         self.setMode(self.MODE_NONE)
 
+    def getCurrentMode(self):
+        return self.currentmode
+
     def setMode(self, mode):
         assert mode in [ 0, 1, 2, 3, 4, 5]
+
+        self.currentmode = mode
 
         self.__clearLayout()
 
         if mode == self.MODE_NONE:
             self.layout().addWidget(self.noneLabel)
 
-        elif mode == self.MODE_NEW_ASSET:
-            self.layout().addWidget(self.confirmCreateButton)
+        elif mode == self.MODE_NEW_FOLDER:
+            self.layout().addWidget(self.field)
+            self.layout().addWidget(self.confirmNewFolderButton)
             self.layout().addWidget(self.cancelButton)
 
         elif mode == self.MODE_VIEW_ASSET:
@@ -76,6 +88,7 @@ class AssetOptionPanel(QWidget):
             self.layout().addWidget(self.deleteFolderButton)
 
         elif mode == self.MODE_CONFIRM_CREATE:
+            self.layout().addWidget(self.field)
             self.layout().addWidget(self.confirmCreateButton)
             self.layout().addWidget(self.cancelButton)
 
@@ -87,6 +100,16 @@ class AssetOptionPanel(QWidget):
     def __clearLayout(self):
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().setParent(None)
+
+    # Confirm New Folder
+    def setOnClickConfirmNewFolder(self, onclick):
+        self.onclickconfirmnewfolder = onclick
+
+    def __defaultOnClickConfirmNewFoler(self, fname):
+        print("confirm new folder:", fname)
+
+    def __onClickConfirmNewFolderPlug(self):
+        self.onclickconfirmnewfolder(self.field.text())
 
     # Toggle
     def setOnClickToggle(self, onclick):
@@ -172,11 +195,11 @@ class AssetOptionPanel(QWidget):
     def setOnClickConfirmCreate(self, onclick):
         self.onclickconfirmcreate = onclick
 
-    def __defaultOnClickConfirmCreate(self):
-        print("click confirm create")
+    def __defaultOnClickConfirmCreate(self, fname):
+        print("click confirm create:", fname)
 
     def __onClickConfirmCreatePlug(self):
-        self.onclickconfirmcreate()
+        self.onclickconfirmcreate(self.field.text())
 
 
 
