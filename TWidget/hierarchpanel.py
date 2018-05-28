@@ -41,7 +41,7 @@ class Item(QPushButton):
     arrowSize = 12
     arrowSpeed = 25
 
-    def __init__(self, id, text, parent=None, level=0, expandable=False):
+    def __init__(self, id, text, parent=None, level=0, expandable=False, iconpath=""):
         QPushButton.__init__(self,"", parent)
         self.id = id
         self.highlighted = False
@@ -51,7 +51,11 @@ class Item(QPushButton):
         self.setFixedWidth(self.fixedWidth)
         self.setStyleSheet(style.normalItem)
 
-        self.icon = ItemIcon()
+        if iconpath != "":
+            self.icon = ItemIcon(iconpath)
+        else:
+            self.icon = ItemIcon()
+
         self.label = ItemLabel(text)
         self.arrow = DropDownArrow(size=self.arrowSize, speed=self.arrowSpeed, updateEquation=self.arrowEq, kernel=self.arrowKernel)
         if not expandable:
@@ -135,7 +139,12 @@ class HierarchyPanel(QScrollArea):
             itemExpandable = self.model.hasChildren(childId)
             itemName = self.model.getNameOf(childId)
 
-            listItem = Item(childId, itemName, level=level, expandable=itemExpandable)
+            if 'isfile' not in itemModel or not itemModel['isfile']:
+                iconpath=''
+            else:
+                iconpath = 'img/img-icon.png'
+
+            listItem = Item(childId, itemName, level=level, expandable=itemExpandable, iconpath=iconpath)
             if 'tip' in itemModel :
                 listItem.setToolTip(itemModel['tip'])
             listItem.clicked.connect(self.__onClickItemPlug)
