@@ -26,6 +26,10 @@ class UserListView(QWidget):
     # def hideLoading(self):
     #     self.loadingFilter.hideLoading()
 
+    def clearAll(self):
+        while self.table.rowCount() > 0:
+            self.table.removeRow(0)
+
     def setIcon(self, iconPath):
         self.title.setIcon(iconPath)
 

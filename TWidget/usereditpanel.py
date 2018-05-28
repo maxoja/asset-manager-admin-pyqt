@@ -43,9 +43,13 @@ class EditPanel(QWidget):
         self.updateButton.clicked.connect(self.__onClickUpdate)
         self.onClickUpdate = self.__defaultOnClick
 
-        self.newButton = QPushButton('New')
-        self.newButton.clicked.connect(self.__onClickNew)
-        self.onClickNew = self.__defaultOnClick
+        self.newAdminButton = QPushButton('New Admin')
+        self.newAdminButton.clicked.connect(self.__onClickNewAdmin)
+        self.onClickNewAdmin = self.__defaultOnClick
+
+        self.newCreatorButton = QPushButton('New Creator')
+        self.newCreatorButton.clicked.connect(self.__onClickNewCreator)
+        self.onClickNewCreator = self.__defaultOnClick
 
         self.deleteButton = QPushButton('Delete')
         self.deleteButton.setStyleSheet('background-color:"red"; color:"white"')
@@ -54,7 +58,8 @@ class EditPanel(QWidget):
 
         buttonBoxLayout = QHBoxLayout()
         buttonBoxLayout.addStretch()
-        buttonBoxLayout.addWidget(self.newButton)
+        buttonBoxLayout.addWidget(self.newAdminButton)
+        buttonBoxLayout.addWidget(self.newCreatorButton)
         buttonBoxLayout.addWidget(self.deleteButton)
 
         self.editFrame = EditFrame()
@@ -90,11 +95,17 @@ class EditPanel(QWidget):
     def setOnClickDelete(self, onClick):
         self.onClickDelete = onClick
 
-    def setOnClickNew(self, onClick):
-        self.onClickNew = onClick
+    def setOnClickNewCreator(self, onClick):
+        self.onClickNewCreator = onClick
 
-    def __onClickNew(self):
-        self.onClickNew(self.editFrame.getEditValueDict(), self.additionalData)
+    def __onClickNewCreator(self):
+        self.onClickNewCreator(self.editFrame.getEditValueDict(), self.additionalData)
+
+    def setOnClickNewAdmin(self, onClick):
+        self.onClickNewAdmin = onClick
+
+    def __onClickNewAdmin(self):
+        self.onClickNewAdmin(self.editFrame.getEditValueDict(), self.additionalData)
 
     def __onClickUpdate(self):
         self.onClickUpdate(self.editFrame.getEditValueDict(), self.additionalData)

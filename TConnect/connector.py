@@ -174,6 +174,26 @@ def addVersion(fileid, version, filetype, onsuccess, onfailed, onerror):
         print(response.text)
         onerror()
 
+def deleteUser(id, onsuccess, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/removeartist/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['id'] = id
+
+    print('delete user . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('delete user result:', response.text)
+        result = response.json()
+        tag = result['tag']
+        comment = result['comment']
+
+        onsuccess()
+    else:
+        print(response.text)
+        onerror()
+
 # remove file
 def deleteFile(fileid, onsuccess, onerror):
     url = 'http://17chuchu.pythonanywhere.com/SystemArt/removefile/'
@@ -231,6 +251,32 @@ def getVersionList(fileid, onreceive, onerror):
     else:
         onerror()
 
+def editUser(id, name, username, password, email, onsuccess, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/edituserinfo/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['id'] = id
+    data['name'] = name
+    data['username'] = username
+    data['password'] = password
+    data['email'] = email
+
+    print('edit user . . .')
+    print(data)
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('edit user result:', response.text)
+        result = response.json()
+        tag = result['tag']
+        comment = result['comment']
+
+        onsuccess()
+    else:
+        print(response.text)
+        onerror()
+
+
 if __name__ == '__main__':
     def onsuccess():
         print("success")
@@ -250,7 +296,7 @@ if __name__ == '__main__':
     def onreceive(result):
         print('receive:', result)
 
-    getAdminList(onreceive, onerror)
+    # getAdminList(onreceive, onerror)
     # getCreatorList(onreceive, onerror)
 
     # deleteFile("7edf103680424da39a69ee6e9760152b", onsuccess, onerror)

@@ -536,7 +536,7 @@ class StepperWidget(QWidget):
         self.checkpoints[id].setData(data)
 
     def getData(self, id):
-        return self.checkpoins[id].getData()
+        return self.checkpoints[id].getData()
 
     def setPrimaryText(self, text, id):
         self.checkpoints[id].setPrimaryText(text)

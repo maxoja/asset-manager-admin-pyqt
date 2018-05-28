@@ -15,23 +15,13 @@ class ManageAssetWindow(QWidget):
         self.setMinimumHeight(600)
 
         tree = HierarchicalModel()
-        tree.add(0, name="root") \
-            .add(1, 0, name="3D models", tip="you can set tooltip text\nby passing tip value of item") \
-            .add(2, 1, name="Weapons") \
-            .add(3, 2, name="Guns") \
-            .add(4, 2, name="Melees") \
-            .add(5, 2, name="Bombs") \
-            .add(6, 1, name="Furnitures") \
-            .add(7, 1, name="Instruments") \
-            .add(8, 1, name="Zombies")
+        tree.add(0, name="root")
 
         # LEFT WIDGET
         self.hierarchy = HierarchyPanel(tree)
 
         # RIGHT WIDGET
         self.commentPanel = CommentPanel()
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
         self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
         self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
         self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
@@ -61,17 +51,9 @@ class ManageAssetWindow(QWidget):
         self.prevAsset = None
         self.assetView = AssetViewWidget()
         self.assetView.setPhoto(QPixmap('img/admin-icon.png'))
-        # self.assetView = UserListView(keys=['id', 'name', 'email'])
-        # self.assetView.setTitleText("Creator User List")
-        # self.assetView.setIcon("img/artist-icon.png")
-        # self.assetView.setOnSelectUser(self.__onClickCreator)
 
         # MID BOTTOM WIDGET
         self.assetOptionPanel = AssetOptionPanel()
-        # self.assetOptionPanel = UserListView(keys=['id', 'name', 'email'])
-        # self.assetOptionPanel.setTitleText("Creator User List")
-        # self.assetOptionPanel.setIcon("img/artist-icon.png")
-        # self.assetOptionPanel.setOnSelectUser(self.__onClickCreator)
 
         # MID LOWER LAYOUT
         midwidget = QWidget()
@@ -130,7 +112,6 @@ class ManageAssetWindow(QWidget):
         connector.getVersionList(fileid, onreceive, lambda : print("error getversion of",fileid))
 
         self.stepper.setOnClickCheckpoint(onclickstep)
-
 
 
 
