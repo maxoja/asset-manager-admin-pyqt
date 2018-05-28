@@ -21,7 +21,7 @@ class StepperCheckpoint(QWidget):
         self.state = initState
         self.onClick = onClick
         self.primaryText = str(id)
-        self.secondaryText = "hello"
+        self.secondaryText = ""
         self.x = 0
         self.top = self.height()/2 - self.visualSize/2
         self.left = self.x - self.visualSize/2
@@ -47,10 +47,11 @@ class StepperCheckpoint(QWidget):
         self.x = x
 
     def paintEvent(self, paintEvent):
+
         painter = QPainter(self)
         painter.setPen(QPen(Qt.NoPen))
 
-        #DEBUG Bounding Box
+        #DEBUG
         #painter.setBrush(QBrush(Qt.lightGray))
         #painter.drawRect(0,0,self.width(), self.height())
 
@@ -108,14 +109,14 @@ class StepperWidget(QWidget):
         print('visual:', self.checkpointVisualSize)
         print('bridge:', self.bridgeLength)
 
-        layout = QHBoxLayout()
-        layout.setContentsMargins(0,0,0,0)
+        self.layout = QHBoxLayout()
+        self.layout.setContentsMargins(0,0,0,0)
 
         for i in range(numStep):
             self.checkpoints[i] = StepperCheckpoint(i, self.checkpointArea, self.checkpointVisualSize, self.__onClickCheckpoint)
-            layout.addWidget(self.checkpoints[i])
+            self.layout.addWidget(self.checkpoints[i])
 
-        self.setLayout(layout)
+        self.setLayout(self.layout)
         self.setCurrentStep(0)
 
     def setCurrentStep(self, currentStep):
@@ -163,21 +164,36 @@ class StepperWidget(QWidget):
     def __onClickCheckpoint(self, id):
         self.setCurrentStep(id)
 
+
+    def setNumberOfCheckpoints(self, numStep):
+        for i in reversed(range(self.layout.count())): 
+            self.layout.itemAt(i).widget().setParent(None)
+
+        self.checkpoints.clear()
+        self.numStep = numStep
+        self.__calculateCheckpointArea()
+        self.__calculateCheckpointVisualSize()
+        self.__calculateBridgeLength()
+        self.__setProperMargin()
+
+        for i in range(numStep):
+            self.checkpoints[i] = StepperCheckpoint(i, self.checkpointArea, self.checkpointVisualSize, self.__onClickCheckpoint)
+            self.layout.addWidget(self.checkpoints[i])
+
+        self.layout.setContentsMargins(0,0,0,0)
+
     def paintEvent(self, paintEvent):
         self.__calculateCheckpointArea()
         self.__calculateCheckpointVisualSize()
         self.__calculateBridgeLength()
         self.__setProperMargin()
 
+        #DEBUG
         print()
         print('width:', self.width())
         print('area:', self.checkpointArea)
         print('visual:', self.checkpointVisualSize)
         print('bridge:', self.bridgeLength)
-
-        # for checkpoint in self.checkpoints.values():
-        #     checkpoint.setDrawParameters(self.checkpointArea, self
-        #     checkpoint.setDrawParameters(self.checkpointArea, self.checkpointVisualSize)
 
         checkpointX = []
         t = (self.width()-self.checkpointArea)/self.numStep + 1
@@ -197,21 +213,11 @@ class StepperWidget(QWidget):
         for checkpoint, x in zip(self.checkpoints.values(), checkpointX):
             checkpoint.setDrawParameters(x, self.checkpointArea, self.checkpointVisualSize)
 
-        # painter.drawLine(0, 0, self.width(), self.height())
-        # painter.drawLine(self.checkpointArea/2, 0, self.checkpointArea/2, self.height())
-        # painter.drawLine(self.width() - self.checkpointArea/2, 0, self.width()-self.checkpointArea/2, self.height())
-
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     window = QWidget()
-    # layout = QVBoxLayout()
-    # widget = StepperWidget(5,parent=window)
-    # layout.addWidget(widget)
-    # layout.setContentsMargins(0,0,0,0)
-    # window.setLayout(layout)
     window = StepperWidget(4)
     window.setCurrentStep(2)
     window.setPrimaryText('v1.0', 0)
@@ -222,6 +228,7 @@ if __name__ == '__main__':
     window.setSecondaryText('debug', 1)
     window.setSecondaryText('refact', 2)
     window.setSecondaryText('update', 3)
+    window.setNumberOfCheckpoints(10)
     window.show()
 
     sys.exit(app.exec_())
