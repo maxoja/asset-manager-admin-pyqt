@@ -36,6 +36,7 @@ class HierarchicalModel:
 
     def getNextId(self):
         return self.maxid+1
+
     def getTree(self, rootId, getIdOnly=False):
         if getIdOnly:
             return rootId, [self.getTree(i, getIdOnly) for i in self.connection[rootId]]
