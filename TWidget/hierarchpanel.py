@@ -41,7 +41,7 @@ class Item(QPushButton):
     arrowSize = 12
     arrowSpeed = 25
 
-    def __init__(self, id, text, parent=None, level=0, expandable=False):
+    def __init__(self, id, text, parent=None, level=0, expandable=False, iconpath=""):
         QPushButton.__init__(self,"", parent)
         self.id = id
         self.highlighted = False
@@ -51,7 +51,11 @@ class Item(QPushButton):
         self.setFixedWidth(self.fixedWidth)
         self.setStyleSheet(style.normalItem)
 
-        self.icon = ItemIcon()
+        if iconpath != "":
+            self.icon = ItemIcon(iconpath)
+        else:
+            self.icon = ItemIcon()
+
         self.label = ItemLabel(text)
         self.arrow = DropDownArrow(size=self.arrowSize, speed=self.arrowSpeed, updateEquation=self.arrowEq, kernel=self.arrowKernel)
         if not expandable:
@@ -105,6 +109,7 @@ class HierarchyPanel(QScrollArea):
         self.model = model
         self.expanding = { i:False for i in self.model.getIds() }
         self.itemDict = dict()
+        self.onclickitem = self.__defaultOnClickItem
 
         self.setFixedWidth(self.fixedWidth)
         self.setMinimumHeight(self.minHeight)
@@ -126,7 +131,7 @@ class HierarchyPanel(QScrollArea):
 
     def __construct(self, layout, id, level):
         if id not in self.expanding:
-            self.__expandItem[id] = False
+            self.__expandItem(id, False)
 
         for childId in self.model.getChildrenOf(id, getIdOnly=True):
 
@@ -134,10 +139,15 @@ class HierarchyPanel(QScrollArea):
             itemExpandable = self.model.hasChildren(childId)
             itemName = self.model.getNameOf(childId)
 
-            listItem = Item(childId, itemName, level=level, expandable=itemExpandable)
+            if 'isfile' not in itemModel or not itemModel['isfile']:
+                iconpath=''
+            else:
+                iconpath = 'img/img-icon.png'
+
+            listItem = Item(childId, itemName, level=level, expandable=itemExpandable, iconpath=iconpath)
             if 'tip' in itemModel :
                 listItem.setToolTip(itemModel['tip'])
-            listItem.clicked.connect(self.__onClickItem)
+            listItem.clicked.connect(self.__onClickItemPlug)
             layout.addWidget(listItem)
             self.itemDict[childId] = listItem
 
@@ -165,6 +175,11 @@ class HierarchyPanel(QScrollArea):
 
         return None
 
+    def getHighlightedDict(self):
+        item = self.getHighlightedItem()
+        itemdict = self.model.getItemOf(item.getId())
+        return itemdict
+
     # def keyPressEvent(self, event):
     #     if event.key() == Qt.Key_D:
     #         item = self.getHighlightedItem()
@@ -180,19 +195,26 @@ class HierarchyPanel(QScrollArea):
         listItem.setSelected(expanding)
 
         for childId in self.model.getChildrenOf(id, getIdOnly=True):
-            childItem = self.itemDict[childId]
+            try:
+                childItem = self.itemDict[childId]
 
-            if expanding :
-                childItem.show()
-            else :
-                self.__expandItem(childId, expanding)
-                childItem.hide()
+                if expanding :
+                    childItem.show()
+                else :
+                    self.__expandItem(childId, expanding)
+                    childItem.hide()
+            except:
+                pass
 
-    def __onClickItem(self):
+    def __onClickItemPlug(self):
+        clickedItemId = -1
+
         for childId, child in self.itemDict.items() :
             if child != self.sender():
                 child.setHighlighted(False)
             else:
+                clickedItemId = child.getId()
+
                 if child.isHighlighted():
                     if child.isSelected():
                         child.setSelected(False)
@@ -202,6 +224,14 @@ class HierarchyPanel(QScrollArea):
                         child.arrow.onDown = lambda i=childId: self.__expandItem(i, True)
 
                 child.setHighlighted(True)
+
+        self.onclickitem(self.model.getItemOf(clickedItemId))
+
+    def setOnClickItem(self, onclick):
+        self.onclickitem = onclick
+
+    def __defaultOnClickItem(self, item):
+        print("clicked on ", item)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

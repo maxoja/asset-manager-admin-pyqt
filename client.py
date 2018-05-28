@@ -1,10 +1,10 @@
-from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel
+from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel, AssetViewWidget, AssetOptionPanel
 from TModel import HierarchicalModel
-from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout, QFileDialog
 from PyQt5.QtCore import Qt
-from qtmodern import styles, windows
+from PyQt5.QtGui import QPixmap
 import sys
-from TConnect import connector
+from TConnect import connector, loader
 
 
 class ManageAssetWindow(QWidget):
@@ -21,33 +21,31 @@ class ManageAssetWindow(QWidget):
             .add(3, 2, name="Guns") \
             .add(4, 2, name="Melees") \
             .add(5, 2, name="Bombs") \
-            .add(24, 1, name="Furnitures") \
-            .add(25, 1, name="Instruments") \
-            .add(26, 1, name="Zombies") \
-            .add(6, 1, name="Vehicles") \
-            .add(7, 6, name="Boats") \
-            .add(8, 6, name="Bikes") \
-            .add(9, 1, name="Trees") \
-            .add(10, 0, name="Sprite Sheets") \
-            .add(11, 10, name="Characters") \
-            .add(12, 10, name="Buildings") \
-            .add(13, 10, name="Map-Tiles") \
-            .add(14, 10, name="Buttons") \
-            .add(15, 10, name="Obstacles") \
-            .add(16, 10, name="Magics") \
-            .add(17, 10, name="Bullets&Rockets") \
-            .add(18, 10, name="Lights") \
-            .add(19, 10, name="Effects") \
-            .add(20, 10, name="Titles") \
-            .add(21, 10, name="9-Patches") \
-            .add(22, 10, name="HUD") \
-            .add(23, 10, name="Bars")
+            .add(6, 1, name="Furnitures") \
+            .add(7, 1, name="Instruments") \
+            .add(8, 1, name="Zombies")
 
         # LEFT WIDGET
         self.hierarchy = HierarchyPanel(tree)
 
         # RIGHT WIDGET
         self.commentPanel = CommentPanel()
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
         self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
         self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
         self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
@@ -60,16 +58,20 @@ class ManageAssetWindow(QWidget):
         [self.stepper.setSecondaryText('', i) for i in range(5)]
 
         # MID MID WIDGET
-        self.assetView = UserListView(keys=['id', 'name', 'email'])
-        self.assetView.setTitleText("Creator User List")
-        self.assetView.setIcon("img/artist-icon.png")
-        self.assetView.setOnSelectUser(self.__onClickCreator)
+        self.prevAsset = None
+        self.assetView = AssetViewWidget()
+        self.assetView.setPhoto(QPixmap('img/admin-icon.png'))
+        # self.assetView = UserListView(keys=['id', 'name', 'email'])
+        # self.assetView.setTitleText("Creator User List")
+        # self.assetView.setIcon("img/artist-icon.png")
+        # self.assetView.setOnSelectUser(self.__onClickCreator)
 
         # MID BOTTOM WIDGET
-        self.assetOptionPanel = UserListView(keys=['id', 'name', 'email'])
-        self.assetOptionPanel.setTitleText("Creator User List")
-        self.assetOptionPanel.setIcon("img/artist-icon.png")
-        self.assetOptionPanel.setOnSelectUser(self.__onClickCreator)
+        self.assetOptionPanel = AssetOptionPanel()
+        # self.assetOptionPanel = UserListView(keys=['id', 'name', 'email'])
+        # self.assetOptionPanel.setTitleText("Creator User List")
+        # self.assetOptionPanel.setIcon("img/artist-icon.png")
+        # self.assetOptionPanel.setOnSelectUser(self.__onClickCreator)
 
         # MID LOWER LAYOUT
         midwidget = QWidget()
@@ -103,22 +105,193 @@ class ManageAssetWindow(QWidget):
     def __onClickAdmin(self, admin):
         print("__onClickAdmin called")
 
+    def __fetchStepper(self):
+        fileid = self.hierarchy.getHighlightedDict()['fileid']
+
+        def onreceive(versionList):
+            print("getversion ", versionList)
+            #TODO
+            # self.stepper.setNodeNumber(len(versionList))
+            for i, ver in enumerate(versionList):
+                ver['fileid'] = fileid
+                self.stepper.setPrimaryText(ver['version'], i)
+                self.stepper.setData(ver, i)
+
+            self.stepper.setCurrentStep(self.stepper.numStep-1)
+
+        connector.getVersionList(fileid, onreceive, lambda : print("error getversion of",fileid))
+
+
+    def __fetchHierarchy(self):
+        def ongetfiles(files):
+            print(files)
+
+            tree = self.hierarchy.model
+            if isinstance(tree, HierarchicalModel):
+                for i in tree.getIds():
+                    tree.removeById(i)
+
+
+            tree.add(0, name="root")
+
+            for file in files:
+                allpath = file['path']
+                splittedpath = allpath.split('-')
+                selfid = int(splittedpath[0])
+                parentid = int(splittedpath[1])
+                filename = splittedpath[2]
+                isfile = '.' in filename
+
+                print(file)
+                tree.add(selfid, parentid, name=filename, isfile=isfile, fileid=file['id'])
+
+            self.hierarchy.reconstruct(0)
+
+        def onclickitem(item):
+            if item['isfile']:
+                self.stepper.setVisible(True)
+                self.__fetchStepper()
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+            else:
+                self.stepper.setVisible(False)
+                self.assetView.setPhoto(None)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
+
+        self.hierarchy.setOnClickItem(onclickitem)
+        connector.getFileList(ongetfiles, lambda: print("error"))
+
+    def __setupOptionPanel(self):
+        # DELETE FOLDER
+        def onsuccessdeletefolder():
+            self.__fetchHierarchy()
+
+        def onDeleteFolder():
+            model = self.hierarchy.model
+            clickeditem = self.hierarchy.getHighlightedItem()
+            itemdict = model.getItemOf(clickeditem.getId())
+            if itemdict['isfile']:
+                print('delete folder : current is not a folder')
+            else:
+                if model.hasChildren(clickeditem.getId()):
+                    print('delete folder : the folder is not empty')
+                else:
+                    connector.deleteFile(itemdict['fileid'], onsuccessdeletefolder, lambda: None)
+
+        # DELETE ASSET
+        def onsuccessdeleteasset():
+            self.__fetchHierarchy()
+
+        def onDeleteAsset():
+            model = self.hierarchy.model
+            clickeditem = self.hierarchy.getHighlightedItem()
+            itemid = clickeditem.getId()
+            itemdict = model.getItemOf(itemid)
+            if itemdict['isfile']:
+                print(itemdict)
+                connector.deleteFile(itemdict['fileid'], onsuccessdeleteasset, lambda: None)
+            else:
+                print('delete asset : the current is not an asset')
+
+        # CREATE NEW FOLDER
+        def onCreateFolder():
+            self.assetOptionPanel.setMode(AssetOptionPanel.MODE_NEW_FOLDER)
+
+        # CREATE NEW ASSET
+        def onCreateAsset():
+            filename = QFileDialog.getOpenFileName(self, "Choose image file", "", "Images(*.png)")
+            if filename[0]:
+                self.loadedAsset = filename[0]
+                self.prevAsset = self.assetView.getCurrentOriginalPixmap()
+
+                self.assetView.setPhoto(QPixmap(filename[0]))
+                self.stepper.setVisible(False)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_CONFIRM_CREATE)
+            else:
+                print("no file selected")
+
+        # CANCEL NEW FOLDER
+        def onCancel():
+            if self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_NEW_FOLDER:
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
+
+            elif self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_CONFIRM_CREATE:
+                self.stepper.setVisible(True)
+                self.assetView.setPhoto(self.prevAsset)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
+
+            elif self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_CONFIRM_UPDATE:
+                self.stepper.setVisible(True)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+
+        # CANCEL NEW ASSET
+        def onCancelCreateAsset():
+            self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+
+        # CONFIRM NEW FOLDER():
+        def onConfirmNewFolder(fname):
+            fname = fname.replace('-', '')
+            fname = fname.replace('.', '')
+
+            if fname == '':
+                print("folder name cant be empty")
+                return
+
+            def onsuccess(result):
+                print('create folder success ', result)
+                self.assetView.setPhoto(None)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_NONE)
+                self.__fetchHierarchy()
+
+            item = self.hierarchy.getHighlightedItem()
+            itemdict = self.hierarchy.getHighlightedDict()
+            path = str(self.hierarchy.model.getNextId()) + '-' + str(item.getId()) + '-' + fname
+            connector.addFile(fname, path, onsuccess, lambda x, y: print('erro', x, y), lambda: None)
+
+        # CONFIRM NEW ASSET
+        def onConfirmNewAsset(fname):
+            fname = fname.replace('-', '')
+
+            if fname == '':
+                print("file name cant be empty")
+                return
+
+            def onsuccess(fileid):
+                print('create file success ', fileid)
+                self.assetView.setPhoto(QPixmap(self.loadedAsset))
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+                self.stepper.setVisible(True)
+
+                def onaddedversion(uploadpath):
+                    loader.upload(uploadpath, self.loadedAsset)
+                    self.__fetchStepper()
+                    self.__fetchHierarchy()
+
+                connector.addVersion(fileid, '1', '.png', onaddedversion, lambda x,y:print("erro",x,y), lambda: None)
+
+
+            item = self.hierarchy.getHighlightedItem()
+            itemdict = self.hierarchy.getHighlightedDict()
+            path = str(self.hierarchy.model.getNextId()) + '-' + str(item.getId()) + '-' + fname
+            connector.addFile(fname, path, onsuccess, lambda x, y: print('erro', x, y), lambda: None)
+
+        self.assetOptionPanel.setOnClickDeleteFolder(onDeleteFolder)
+        self.assetOptionPanel.setOnClickDeleteAsset(onDeleteAsset)
+        self.assetOptionPanel.setOnClickCreateFolder(onCreateFolder)
+        self.assetOptionPanel.setOnClickCreate(onCreateAsset)
+        self.assetOptionPanel.setOnClickCancel(onCancel)
+        self.assetOptionPanel.setOnClickConfirmNewFolder(onConfirmNewFolder)
+        self.assetOptionPanel.setOnClickConfirmCreate(onConfirmNewAsset)
+
+
     def __initialize(self):
-        def onreceive(result):
-            for k, v in result.items():
-                v['id'] = k
-                self.assetView.addUser(v)
-                print(k, v)
-
-        def onerror():
-            print('get creator list error occurred')
-
-        connector.getCreatorList(onreceive, onerror)
-
+        loader.init()
+        self.__fetchHierarchy()
+        self.__setupOptionPanel()
 
 app = QApplication(sys.argv)
 
 dialog = LoginDialog()
+dialog.setWindowTitle("Asset Manager Client Login")
 dialog.show()
 loginResult = dialog.exec_()
 

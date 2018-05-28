@@ -109,6 +109,113 @@ def getCreatorList(onreceive, onerror):
     else:
         onerror()
 
+# add file
+def addFile(name, path, onsuccess, onfailed, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/addfile/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['name'] = name
+    data['path'] = path
+
+    print('add file . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('add file result:', response.text)
+        result = response.json()
+        tag = result['tag']
+        comment = result['comment']
+
+        if tag == 0:
+            onsuccess(comment[-32:])
+        else:
+            onfailed(tag, comment)
+    else:
+        onerror()
+
+# add file version
+def addVersion(fileid, version, filetype, onsuccess, onfailed, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/addversion/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['fileid'] = fileid
+    data['version'] = version
+    data['filetype'] = filetype
+
+    print('add version . . .')
+    print('json =', data)
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('add version result:', response.text)
+        result = response.json()
+        tag = result['tag']
+        comment = result['comment']
+
+        if tag == 0:
+            onsuccess(comment.split('#')[1])
+        else:
+            onfailed(tag, comment)
+    else:
+        print(response.text)
+        onerror()
+
+# remove file
+def deleteFile(fileid, onsuccess, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/removefile/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['id'] = fileid
+
+    print('delete file . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('delete file result:', response.text)
+        result = response.json()
+        tag = result['tag']
+        comment = result['comment']
+
+        onsuccess()
+    else:
+        print(response.text)
+        onerror()
+
+# list all file [ DONE ]
+def getFileList(onreceive, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/listallfile/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+
+    print('getting file list . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('get file list result:', response.text)
+        fileDict = response.json()
+        fileList = [ fileDict[k] for k in fileDict ]
+        for f, i in zip(fileList, fileDict.keys()): f['id'] = i
+        onreceive(fileList)
+    else:
+        onerror()
+
+# list all version of a file
+def getVersionList(fileid, onreceive, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/listallversionoffile/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['fileid'] = fileid
+
+    print('getting version list . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('get version list result:', response.text)
+        versionDict = response.json()
+        versionList = [ versionDict[k] for k in versionDict ]
+        onreceive(versionList)
+    else:
+        onerror()
 
 if __name__ == '__main__':
     def onsuccess():
@@ -128,4 +235,28 @@ if __name__ == '__main__':
 
     def onreceive(result):
         print('receive:', result)
-    getCreatorList(onreceive, onerror)
+
+    # getCreatorList(onreceive, onerror)
+
+    deleteFile("5f78475119f54e5ab87630bd519250ab", onsuccess, onerror)
+    # deleteFile("7edf103680424da39a69ee6e9760152b", onsuccess, onerror)
+    getFileList(onreceive, onerror)
+
+    def onsuccess(fileid):
+        print("success add file", fileid)
+
+    # addFile("folder 1", "1-0-folder 1", onsuccess, onfailed, onerror)
+    # addFile("folder 2", "2-1-folder 2", onsuccess, onfailed, onerror)
+    # addFile("c.png", "3-1-c.png", onsuccess, onfailed, onerror)
+    # addFile("d.png", "4-2-d.png", onsuccess, onfailed, onerror)
+    # addFile("e.png", "5-0-e.png", onsuccess, onfailed, onerror)
+    # addFile("f.png", "6-0-f.png", onsuccess, onfailed, onerror)
+
+    # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "1", ".png", onsuccess, onfailed, onerror)
+    # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "2", ".png", onsuccess, onfailed, onerror)
+    # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "3", ".png", onsuccess, onfailed, onerror)
+    # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "4", ".png", onsuccess, onfailed, onerror)
+
+    getVersionList("2159f1a2d7f048dfa186b44b32b77d28", onreceive, onerror)
+    # getVersionList("2986c86deae34f9eb498bdf040fa808c", onreceive, onerror)
+

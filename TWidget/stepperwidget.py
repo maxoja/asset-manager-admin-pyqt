@@ -16,6 +16,7 @@ class StepperCheckpoint(QWidget):
     def __init__(self, id, area, visualSize, onClick, initState=STATE_PASSIVE):
         QWidget.__init__(self)
         self.id = id
+        self.data = None
         self.area = area
         self.visualSize = visualSize
         self.state = initState
@@ -35,11 +36,23 @@ class StepperCheckpoint(QWidget):
     def setOnClick(self, onClick):
         self.onClick = onClick
 
+    def setData(self, data):
+        self.data = data
+
+    def getData(self):
+        return self.data
+
     def setPrimaryText(self, text):
         self.primaryText = text
 
+    def getPrimaryText(self):
+        return self.primaryText
+
     def setSecondaryText(self, text):
         self.secondaryText = text
+
+    def getSecondaryText(self):
+        return self.secondaryText
 
     def setDrawParameters(self, x, area, visualSize):
         self.area = area
@@ -78,12 +91,12 @@ class StepperCheckpoint(QWidget):
 
     def mousePressEvent(self, event):
         if self.checkMouse(event.x(), event.y()):
-            print(self.id)
+            # print(self.id)
             self.onClick(self.id)
 
-    def mouseMoveEvent(self, event):
-        if self.checkMouse(event.x(), event.y()):
-            print("Mouse entered " + str(self.id) + " at (" + str(event.x()) + "," + str(event.y()) + ")")
+    # def mouseMoveEvent(self, event):
+        # if self.checkMouse(event.x(), event.y()):
+            # print("Mouse entered " + str(self.id) + " at (" + str(event.x()) + "," + str(event.y()) + ")")
 
 
 class StepperWidget(QWidget):
@@ -103,10 +116,10 @@ class StepperWidget(QWidget):
 
         self.setMinimumSize(200, 50)
 
-        print('width:', self.width())
-        print('area:', self.checkpointArea)
-        print('visual:', self.checkpointVisualSize)
-        print('bridge:', self.bridgeLength)
+        # print('width:', self.width())
+        # print('area:', self.checkpointArea)
+        # print('visual:', self.checkpointVisualSize)
+        # print('bridge:', self.bridgeLength)
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0,0,0,0)
@@ -123,7 +136,7 @@ class StepperWidget(QWidget):
 
         for i, checkpoint in self.checkpoints.items():
             if i < currentStep:
-                print('---')
+                # print('---')
                 checkpoint.setState(StepperCheckpoint.STATE_ACTIVE)
             elif i == currentStep:
                 checkpoint.setState(StepperCheckpoint.STATE_CURRENT)
@@ -136,11 +149,23 @@ class StepperWidget(QWidget):
         for checkpoint in self.checkpoints.values():
             checkpoint.setOnClick(onClick)
 
+    def setData(self, data, id):
+        self.checkpoints[id].setData(data)
+
+    def getData(self, id):
+        return self.checkpoins[id].getData()
+
     def setPrimaryText(self, text, id):
         self.checkpoints[id].setPrimaryText(text)
 
+    def getPrimaryText(self, id):
+        return self.checkpoints[id].getPrimaryText()
+
     def setSecondaryText(self, text, id):
         self.checkpoints[id].setSecondaryText(text)
+
+    def getSecondaryText(self, id):
+        return self.checkpoints[id].getSecondaryText()
 
     def __calculateCheckpointArea(self):
         checkpointArea = self.width()/(self.numStep+1)
@@ -169,11 +194,11 @@ class StepperWidget(QWidget):
         self.__calculateBridgeLength()
         self.__setProperMargin()
 
-        print()
-        print('width:', self.width())
-        print('area:', self.checkpointArea)
-        print('visual:', self.checkpointVisualSize)
-        print('bridge:', self.bridgeLength)
+        # print()
+        # print('width:', self.width())
+        # print('area:', self.checkpointArea)
+        # print('visual:', self.checkpointVisualSize)
+        # print('bridge:', self.bridgeLength)
 
         # for checkpoint in self.checkpoints.values():
         #     checkpoint.setDrawParameters(self.checkpointArea, self
