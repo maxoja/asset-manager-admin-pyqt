@@ -240,7 +240,7 @@ def getVersionList(fileid, onreceive, onerror):
     data['authtoken'] = getAuthToken()
     data['fileid'] = fileid
 
-    print('getting version list . . .')
+    print('getting version list of ',fileid, '. . .')
     response = requests.post(url, json=data)
 
     if response.ok:

@@ -46,11 +46,12 @@ class ManageAssetWindow(QWidget):
         # MID TOP WIDGET
         self.stepper = StepperWidget(5, checkpointCover=0.7)
         [self.stepper.setSecondaryText('', i) for i in range(5)]
+        self.stepper.setVisible(False)
 
         # MID MID WIDGET
         self.prevAsset = None
         self.assetView = AssetViewWidget()
-        self.assetView.setPhoto(QPixmap('img/admin-icon.png'))
+        self.assetView.setPhoto(QPixmap('img/cant-show.png'))
 
         # MID BOTTOM WIDGET
         self.assetOptionPanel = AssetOptionPanel()
@@ -87,16 +88,25 @@ class ManageAssetWindow(QWidget):
     def __onClickAdmin(self, admin):
         print("__onClickAdmin called")
 
-    def __fetchStepper(self):
+    def __fetchStepper(self, fid=None):
         def onclickstep(stepid):
             if stepid == self.stepper.numStep-1 :
                 self.stepper.setCurrentStep(self.stepper.numStep-2)
                 return
 
+            self.stepper.setCurrentStep(stepid)
             versiondata = self.stepper.getData(stepid)
-            print(versiondata)
+            print("click step", versiondata)
+            firebasepath = versiondata['downloadpath']
+            fileid = versiondata['fileid']
 
-        fileid = self.hierarchy.getHighlightedDict()['fileid']
+            loader.download(firebasepath, 'temp.png')
+            self.assetView.setPhoto(QPixmap('temp.png'))
+
+        if fid is not None:
+            fileid = fid
+        else:
+            fileid = self.hierarchy.getHighlightedDict()['fileid']
 
         def onreceive(versionList):
             print("getversion ", versionList)
@@ -106,6 +116,10 @@ class ManageAssetWindow(QWidget):
                 ver['fileid'] = fileid
                 self.stepper.setPrimaryText(ver['version'], i)
                 self.stepper.setData(ver, i)
+
+                if i == len(versionList)-1:
+                    loader.download(ver['downloadpath'], 'temp.png')
+                    self.assetView.setPhoto(QPixmap('temp.png'))
 
             self.stepper.setCurrentStep(self.stepper.numStep-2)
 
@@ -147,7 +161,7 @@ class ManageAssetWindow(QWidget):
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
             else:
                 self.stepper.setVisible(False)
-                self.assetView.setPhoto(None)
+                self.assetView.setPhoto(QPixmap('img/cant-show.png'))
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
 
         self.hierarchy.setOnClickItem(onclickitem)
@@ -214,6 +228,7 @@ class ManageAssetWindow(QWidget):
 
             elif self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_CONFIRM_UPDATE:
                 self.stepper.setVisible(True)
+                self.assetView.setPhoto(self.prevAsset)
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
 
         # CANCEL NEW ASSET
@@ -248,6 +263,9 @@ class ManageAssetWindow(QWidget):
                 print("file name cant be empty")
                 return
 
+            if fname[-4:] != '.png':
+                fname += '.png'
+
             def onsuccess(fileid):
                 print('create file success ', fileid)
                 self.assetView.setPhoto(QPixmap(self.loadedAsset))
@@ -256,16 +274,39 @@ class ManageAssetWindow(QWidget):
 
                 def onaddedversion(uploadpath):
                     loader.upload(uploadpath, self.loadedAsset)
-                    self.__fetchStepper()
+                    self.__fetchStepper(fileid)
                     self.__fetchHierarchy()
 
                 connector.addVersion(fileid, '1', '.png', onaddedversion, lambda x,y:print("erro",x,y), lambda: None)
-
 
             item = self.hierarchy.getHighlightedItem()
             itemdict = self.hierarchy.getHighlightedDict()
             path = str(self.hierarchy.model.getNextId()) + '-' + str(item.getId()) + '-' + fname
             connector.addFile(fname, path, onsuccess, lambda x, y: print('erro', x, y), lambda: None)
+
+        def onConfirmUpdate():
+            nextversion = self.stepper.numStep
+
+            def onsuccess(uploadpath):
+                loader.upload(uploadpath, self.loadedAsset)
+                self.__fetchStepper()
+                self.stepper.setVisible(True)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+
+            fileid = self.hierarchy.getHighlightedDict()['fileid']
+            connector.addVersion(fileid, str(nextversion), '.png', onsuccess, lambda x,y: None, lambda :print('error'))
+
+        def onUpdateAsset():
+            filename = QFileDialog.getOpenFileName(self, "Choose image file", "", "Images(*.png)")
+            if filename[0]:
+                self.loadedAsset = filename[0]
+                self.prevAsset = self.assetView.getCurrentOriginalPixmap()
+
+                self.assetView.setPhoto(QPixmap(filename[0]))
+                self.stepper.setVisible(False)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_CONFIRM_UPDATE)
+            else:
+                print("no file selected")
 
         self.assetOptionPanel.setOnClickDeleteFolder(onDeleteFolder)
         self.assetOptionPanel.setOnClickDeleteAsset(onDeleteAsset)
@@ -274,6 +315,8 @@ class ManageAssetWindow(QWidget):
         self.assetOptionPanel.setOnClickCancel(onCancel)
         self.assetOptionPanel.setOnClickConfirmNewFolder(onConfirmNewFolder)
         self.assetOptionPanel.setOnClickConfirmCreate(onConfirmNewAsset)
+        self.assetOptionPanel.setOnClickConfirmUpdate(onConfirmUpdate)
+        self.assetOptionPanel.setOnClickUpdate(onUpdateAsset)
 
 
     def __initialize(self):
