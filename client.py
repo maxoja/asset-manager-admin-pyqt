@@ -123,13 +123,41 @@ class ManageAssetWindow(QWidget):
     def __onClickAdmin(self, admin):
         print("__onClickAdmin called")
 
+    def __fetchHierarchy(self):
+        def ongetfiles(files):
+            print(files)
+
+            tree = self.hierarchy.model
+            if isinstance(tree, HierarchicalModel):
+
+                for i in tree.getIds():
+                    tree.removeById(i)
+
+            tree.add(0, name="root")
+
+            for file in files:
+                allpath = file['path']
+                splittedpath = allpath.split('-')
+                selfid = int(splittedpath[0])
+                parentid = int(splittedpath[1])
+                filename = splittedpath[2]
+                isfile = '.' in filename
+
+                tree.add(selfid, parentid, name=filename, isfile=isfile)
+                print(selfid, parentid, filename, isfile)
+
+            self.hierarchy.reconstruct(0)
+
+        connector.getFileList(ongetfiles, lambda: print("error"))
+
     def __initialize(self):
-        pass
+        self.__fetchHierarchy()
 
 
 app = QApplication(sys.argv)
 
 dialog = LoginDialog()
+dialog.setWindowTitle("Asset Manager Client Login")
 dialog.show()
 loginResult = dialog.exec_()
 

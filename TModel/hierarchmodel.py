@@ -7,6 +7,7 @@ class HierarchicalModel:
     def add(self, id, parentId=None, **item):
         assert( 'name' in item )
         assert( id not in self.itemDict )
+        item['parentId'] = parentId
         self.itemDict[id] = item
         self.connection[id] = []
 
@@ -24,7 +25,7 @@ class HierarchicalModel:
 
         if self.unmatched:
             for i in self.unmatched[::]:
-                if id == self.itemDict[i].parentId:
+                if id == self.itemDict[i]['parentId']:
                     self.connection[id].append(i)
                     self.unmatched.remove(i)
 
@@ -72,7 +73,11 @@ class HierarchicalModel:
 
 
     def getIds(self):
-        return self.itemDict.keys()
+        newlist = []
+        for i in self.itemDict.keys():
+            newlist.append(i)
+
+        return newlist
 
     def getItemOf(self, id):
         return self.itemDict[id]
