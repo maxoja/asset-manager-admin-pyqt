@@ -127,7 +127,7 @@ class HierarchyPanel(QScrollArea):
 
     def __construct(self, layout, id, level):
         if id not in self.expanding:
-            self.__expandItem[id] = False
+            self.__expandItem(id, False)
 
         for childId in self.model.getChildrenOf(id, getIdOnly=True):
 
@@ -165,6 +165,11 @@ class HierarchyPanel(QScrollArea):
                 return i
 
         return None
+
+    def getHighlightedDict(self):
+        item = self.getHighlightedItem()
+        itemdict = self.model.getItemOf(item.getId())
+        return itemdict
 
     # def keyPressEvent(self, event):
     #     if event.key() == Qt.Key_D:
