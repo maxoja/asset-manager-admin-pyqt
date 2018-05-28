@@ -148,6 +148,13 @@ class ManageAssetWindow(QWidget):
 
             self.hierarchy.reconstruct(0)
 
+        def onclickitem(item):
+            if item['isfile']:
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+            else:
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
+
+        self.hierarchy.setOnClickItem(onclickitem)
         connector.getFileList(ongetfiles, lambda: print("error"))
 
     def __initialize(self):
