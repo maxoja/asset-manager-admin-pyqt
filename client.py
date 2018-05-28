@@ -171,9 +171,35 @@ class ManageAssetWindow(QWidget):
             else:
                 print('delete asset : the current is not an asset')
 
+        # CREATE NEW FOLDER
+        def onCreateFolder():
+            self.assetOptionPanel.setMode(AssetOptionPanel.MODE_NEW_FOLDER)
+
+        # CREATE NEW ASSET
+        def onCreateAsset():
+            # pop select file
+            self.assetOptionPanel.setMode(AssetOptionPanel.MODE_CONFIRM_CREATE)
+
+        # CANCEL NEW FOLDER
+        def onCancel():
+            if self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_NEW_FOLDER:
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
+
+            elif self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_CONFIRM_CREATE:
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
+
+            elif self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_CONFIRM_UPDATE:
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+
+        # CANCEL NEW ASSET
+        def onCancelCreateAsset():
+            self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+
         self.assetOptionPanel.setOnClickDeleteFolder(onDeleteFolder)
         self.assetOptionPanel.setOnClickDeleteAsset(onDeleteAsset)
-
+        self.assetOptionPanel.setOnClickCreateFolder(onCreateFolder)
+        self.assetOptionPanel.setOnClickCreate(onCreateAsset)
+        self.assetOptionPanel.setOnClickCancel(onCancel)
 
 
     def __initialize(self):
