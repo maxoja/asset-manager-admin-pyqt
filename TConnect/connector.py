@@ -203,6 +203,6 @@ if __name__ == '__main__':
     def onsuccess(fileid):
         print("success add file", fileid)
 
-    # addFile("hello.png", "root/hello.png", onsuccess, onfailed, onerror)
+    # addFile("hello.png", "id-parentid-hello.png", onsuccess, onfailed, onerror)
     addVersion("5966f98c3e7c4c4cbef4c917d9ef99e8", "1.0", ".png", onsuccess, onfailed, onerror)
 
