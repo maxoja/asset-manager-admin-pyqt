@@ -14,6 +14,18 @@ class AssetOptionPanel(QWidget):
 
         self.noneLabel = QLabel("please select a folder/an asset")
 
+        self.createFolderButton = QPushButton("Create New Folder")
+        self.onclickcreatefolder = self.__defaultOnClickCreateFolder
+        self.createFolderButton.clicked.connect(self.__onClickCreateFolderPlug)
+
+        self.deleteAssetButton = QPushButton("Delete This Asset")
+        self.onclickdeleteasset = self.__defaultOnClickDeleteAsset
+        self.deleteAssetButton.clicked.connect(self.__onClickDeleteAssetPlug)
+
+        self.deleteFolderButton = QPushButton("Delete This Folder")
+        self.onclickdeletefolder = self.__defaultOnClickDeleteFolder
+        self.deleteFolderButton.clicked.connect(self.__onClickDeleteFolderPlug)
+
         self.cancelButton = QPushButton("Cancel")
         self.onclickcancel = self.__defaultOnClickCancel
         self.cancelButton.clicked.connect(self.__onClickCancelPlug)
@@ -34,6 +46,10 @@ class AssetOptionPanel(QWidget):
         self.onclickconfirmcreate = self.__defaultOnClickConfirmCreate
         self.confirmCreateButton.clicked.connect(self.__onClickConfirmCreatePlug)
 
+        self.toggleButton = QPushButton("Toggle Comment")
+        self.onclicktogglecomment = self.__defaultOnClickToggle
+        self.toggleButton.clicked.connect(self.__onClickTogglePlug)
+
         layout = QHBoxLayout(self)
 
         self.setMode(self.MODE_NONE)
@@ -52,9 +68,12 @@ class AssetOptionPanel(QWidget):
 
         elif mode == self.MODE_VIEW_ASSET:
             self.layout().addWidget(self.updateButton)
+            self.layout().addWidget(self.deleteAssetButton)
 
         elif mode == self.MODE_FOLDER:
+            self.layout().addWidget(self.createFolderButton)
             self.layout().addWidget(self.createButton)
+            self.layout().addWidget(self.deleteFolderButton)
 
         elif mode == self.MODE_CONFIRM_CREATE:
             self.layout().addWidget(self.confirmCreateButton)
@@ -68,6 +87,46 @@ class AssetOptionPanel(QWidget):
     def __clearLayout(self):
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().setParent(None)
+
+    # Toggle
+    def setOnClickToggle(self, onclick):
+        self.onclicktogglecomment = onclick
+
+    def __defaultOnClickToggle(self):
+        print("click toggle")
+
+    def __onClickTogglePlug(self):
+        self.onclicktogglecomment()
+
+    # Create Folder
+    def setOnClickCreateFolder(self, onclick):
+        self.onclickcreatefolder = onclick
+
+    def __defaultOnClickCreateFolder(self):
+        print("click create folder")
+
+    def __onClickCreateFolderPlug(self):
+        self.onclickcreatefolder()
+
+    # Delete Asset
+    def setOnClickDeleteAsset(self, onclick):
+        self.onclickdeleteasset = onclick
+
+    def __defaultOnClickDeleteAsset(self):
+        print("click delete asset")
+
+    def __onClickDeleteAssetPlug(self):
+        self.onclickdeleteasset()
+
+    # Delete Folder
+    def setOnClickDeleteFolder(self, onclick):
+        self.onclickdeleteasset = onclick
+
+    def __defaultOnClickDeleteFolder(self):
+        print("click delete asset")
+
+    def __onClickDeleteFolderPlug(self):
+        self.onclickdeleteasset()
 
     # Cancel
     def setOnClickCancel(self, onclick):

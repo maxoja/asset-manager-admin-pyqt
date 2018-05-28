@@ -22,27 +22,9 @@ class ManageAssetWindow(QWidget):
             .add(3, 2, name="Guns") \
             .add(4, 2, name="Melees") \
             .add(5, 2, name="Bombs") \
-            .add(24, 1, name="Furnitures") \
-            .add(25, 1, name="Instruments") \
-            .add(26, 1, name="Zombies") \
-            .add(6, 1, name="Vehicles") \
-            .add(7, 6, name="Boats") \
-            .add(8, 6, name="Bikes") \
-            .add(9, 1, name="Trees") \
-            .add(10, 0, name="Sprite Sheets") \
-            .add(11, 10, name="Characters") \
-            .add(12, 10, name="Buildings") \
-            .add(13, 10, name="Map-Tiles") \
-            .add(14, 10, name="Buttons") \
-            .add(15, 10, name="Obstacles") \
-            .add(16, 10, name="Magics") \
-            .add(17, 10, name="Bullets&Rockets") \
-            .add(18, 10, name="Lights") \
-            .add(19, 10, name="Effects") \
-            .add(20, 10, name="Titles") \
-            .add(21, 10, name="9-Patches") \
-            .add(22, 10, name="HUD") \
-            .add(23, 10, name="Bars")
+            .add(6, 1, name="Furnitures") \
+            .add(7, 1, name="Instruments") \
+            .add(8, 1, name="Zombies")
 
         # LEFT WIDGET
         self.hierarchy = HierarchyPanel(tree)
@@ -143,8 +125,8 @@ class ManageAssetWindow(QWidget):
                 filename = splittedpath[2]
                 isfile = '.' in filename
 
-                tree.add(selfid, parentid, name=filename, isfile=isfile)
-                print(selfid, parentid, filename, isfile)
+                tree.add(selfid, parentid, name=filename, isfile=isfile, fileid=file['id'])
+                print(file)
 
             self.hierarchy.reconstruct(0)
 
@@ -157,9 +139,46 @@ class ManageAssetWindow(QWidget):
         self.hierarchy.setOnClickItem(onclickitem)
         connector.getFileList(ongetfiles, lambda: print("error"))
 
+    def __setupOptionPanel(self):
+        # DELETE FOLDER
+        def onsuccessdeletefolder():
+            self.__fetchHierarchy()
+
+        def onDeleteFolder():
+            model = self.hierarchy.model
+            clickeditem = self.hierarchy.getHighlightedItem()
+            itemdict = model.getItemOf(clickeditem.getId())
+            if itemdict['isfile']:
+                print('delete folder : current is not a folder')
+            else:
+                if model.hasChildren(clickeditem.getId()):
+                    print('delete folder : the folder is not empty')
+                else:
+                    connector.deleteFile(itemdict['fileid'], onsuccessdeletefolder, lambda: None)
+
+        # DELETE ASSET
+        def onsuccessdeleteasset():
+            self.__fetchHierarchy()
+
+        def onDeleteAsset():
+            model = self.hierarchy.model
+            clickeditem = self.hierarchy.getHighlightedItem()
+            itemid = clickeditem.getId()
+            itemdict = model.getItemOf(itemid)
+            if itemdict['isfile']:
+                print(itemdict)
+                connector.deleteFile(itemdict['fileid'], onsuccessdeleteasset, lambda: None)
+            else:
+                print('delete asset : the current is not an asset')
+
+        self.assetOptionPanel.setOnClickDeleteFolder(onDeleteFolder)
+        self.assetOptionPanel.setOnClickDeleteAsset(onDeleteAsset)
+
+
+
     def __initialize(self):
         self.__fetchHierarchy()
-
+        self.__setupOptionPanel()
 
 app = QApplication(sys.argv)
 
