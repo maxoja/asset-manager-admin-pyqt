@@ -1,4 +1,4 @@
-from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel, AssetViewWidget
+from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel, AssetViewWidget, AssetOptionPanel
 from TModel import HierarchicalModel
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout
 from PyQt5.QtCore import Qt
@@ -85,10 +85,11 @@ class ManageAssetWindow(QWidget):
         # self.assetView.setOnSelectUser(self.__onClickCreator)
 
         # MID BOTTOM WIDGET
-        self.assetOptionPanel = UserListView(keys=['id', 'name', 'email'])
-        self.assetOptionPanel.setTitleText("Creator User List")
-        self.assetOptionPanel.setIcon("img/artist-icon.png")
-        self.assetOptionPanel.setOnSelectUser(self.__onClickCreator)
+        self.assetOptionPanel = AssetOptionPanel()
+        # self.assetOptionPanel = UserListView(keys=['id', 'name', 'email'])
+        # self.assetOptionPanel.setTitleText("Creator User List")
+        # self.assetOptionPanel.setIcon("img/artist-icon.png")
+        # self.assetOptionPanel.setOnSelectUser(self.__onClickCreator)
 
         # MID LOWER LAYOUT
         midwidget = QWidget()
