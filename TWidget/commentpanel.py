@@ -51,7 +51,9 @@ class CommentItem(QPushButton):
                 else:
                     w.setMinimumHeight(50)
                     if w.layout().count() > 1:
-                        w.layout().removeItem(w.layout().itemAt(1))
+                        item = w.layout().itemAt(1)
+                        w.layout().removeItem(item)
+                        item.widget().setParent(None)
 
         self.onClickComment(self.model)
 
