@@ -195,11 +195,30 @@ class ManageAssetWindow(QWidget):
         def onCancelCreateAsset():
             self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
 
+        # CONFIRM NEW FOLDER():
+        def onConfirmNewFolder(fname):
+            fname = fname.replace('-', '')
+            fname = fname.replace('.', '')
+
+            if fname == '':
+                print("folder name cant be empty")
+                return
+
+            def onsuccess(result):
+                print('create folder success ', result)
+                self.__fetchHierarchy()
+
+            item = self.hierarchy.getHighlightedItem()
+            itemdict = self.hierarchy.getHighlightedDict()
+            path = str(self.hierarchy.model.getNextId()) + '-' + str(item.getId()) + '-' + fname
+            connector.addFile(fname, path, onsuccess, lambda x, y: print('erro', x, y), lambda: None)
+
         self.assetOptionPanel.setOnClickDeleteFolder(onDeleteFolder)
         self.assetOptionPanel.setOnClickDeleteAsset(onDeleteAsset)
         self.assetOptionPanel.setOnClickCreateFolder(onCreateFolder)
         self.assetOptionPanel.setOnClickCreate(onCreateAsset)
         self.assetOptionPanel.setOnClickCancel(onCancel)
+        self.assetOptionPanel.setOnClickConfirmNewFolder(onConfirmNewFolder)
 
 
     def __initialize(self):
