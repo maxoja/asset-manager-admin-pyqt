@@ -7,3 +7,4 @@ from .hierarchpanel import HierarchyPanel
 from .stepperwidget import StepperWidget
 from .commentpanel import CommentPanel
 from .assetview import AssetViewWidget
+from .assetoption import AssetOptionPanel
