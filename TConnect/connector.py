@@ -109,6 +109,73 @@ def getCreatorList(onreceive, onerror):
     else:
         onerror()
 
+# add file
+def addFile(name, path, onsuccess, onfailed, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/addfile/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['name'] = name
+    data['path'] = path
+
+    print('add file . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('add file result:', response.text)
+        result = response.json()
+        tag = result['tag']
+        comment = result['comment']
+
+        if tag == 0:
+            onsuccess(comment[-32:])
+        else:
+            onfailed(tag, comment)
+    else:
+        onerror()
+
+# add file version
+def addVersion(fileid, version, filetype, onsuccess, onfailed, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/addversion/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['id'] = fileid
+    data['version'] = version
+    data['filetype'] = filetype
+
+    print('add version . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('add version result:', response.text)
+        result = response.json()
+        tag = result['tag']
+        comment = result['comment']
+
+        if tag == 0:
+            onsuccess(comment[-32:])
+        else:
+            onfailed(tag, comment)
+    else:
+        onerror()
+
+# remove file
+
+# list all file
+def getFileList(onreceive, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/listallfile/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+
+    print('getting file list . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('get file list result:', response.text)
+        onreceive(response.json())
+    else:
+        onerror()
+
+# list all version of a file
 
 if __name__ == '__main__':
     def onsuccess():
@@ -128,4 +195,14 @@ if __name__ == '__main__':
 
     def onreceive(result):
         print('receive:', result)
-    getCreatorList(onreceive, onerror)
+
+    # getCreatorList(onreceive, onerror)
+
+    getFileList(onreceive, onerror)
+
+    def onsuccess(fileid):
+        print("success add file", fileid)
+
+    # addFile("hello.png", "root/hello.png", onsuccess, onfailed, onerror)
+    addVersion("5966f98c3e7c4c4cbef4c917d9ef99e8", "1.0", ".png", onsuccess, onfailed, onerror)
+
