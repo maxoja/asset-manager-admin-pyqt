@@ -106,20 +106,32 @@ class ManageAssetWindow(QWidget):
         print("__onClickAdmin called")
 
     def __fetchStepper(self):
+        def onclickstep(stepid):
+            if stepid == self.stepper.numStep-1 :
+                self.stepper.setCurrentStep(self.stepper.numStep-2)
+                return
+
+            versiondata = self.stepper.getData(stepid)
+            print(versiondata)
+
         fileid = self.hierarchy.getHighlightedDict()['fileid']
 
         def onreceive(versionList):
             print("getversion ", versionList)
-            #TODO
-            # self.stepper.setNodeNumber(len(versionList))
+            self.stepper.setNumberOfCheckpoints(max(2,len(versionList)+1))
+            self.stepper.setPrimaryText('+', len(versionList))
             for i, ver in enumerate(versionList):
                 ver['fileid'] = fileid
                 self.stepper.setPrimaryText(ver['version'], i)
                 self.stepper.setData(ver, i)
 
-            self.stepper.setCurrentStep(self.stepper.numStep-1)
+            self.stepper.setCurrentStep(self.stepper.numStep-2)
 
         connector.getVersionList(fileid, onreceive, lambda : print("error getversion of",fileid))
+
+        self.stepper.setOnClickCheckpoint(onclickstep)
+
+
 
 
     def __fetchHierarchy(self):

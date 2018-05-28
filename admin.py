@@ -13,12 +13,12 @@ class ManageUserWindow(QWidget):
         self.setMinimumWidth(800)
         self.setMinimumHeight(600)
 
-        self.adminListView = UserListView()
+        self.adminListView = UserListView(keys=['id', 'name', 'email', 'password'])
         self.adminListView.setTitleText("Admin User List")
         self.adminListView.setIcon("img/admin-icon.png")
         self.adminListView.setOnSelectUser(self.__onClickAdmin)
 
-        self.creatorListView = UserListView(keys=['id', 'name', 'email'])
+        self.creatorListView = UserListView(keys=['id', 'name', 'email', 'password'])
         self.creatorListView.setTitleText("Creator User List")
         self.creatorListView.setIcon("img/artist-icon.png")
         self.creatorListView.setOnSelectUser(self.__onClickCreator)
@@ -49,6 +49,9 @@ class ManageUserWindow(QWidget):
 
     def __onClickAdmin(self, admin):
         print("__onClickAdmin called")
+        self.editPanel.setEditValue('Display Name', admin['name'])
+        self.editPanel.setEditValue('Email', admin['email'])
+        self.editPanel.setAdditionalData(admin)
 
     def __initialize(self):
         def onreceive(result):
@@ -64,6 +67,15 @@ class ManageUserWindow(QWidget):
 
         # self.creatorListView.showLoading()
         connector.getCreatorList(onreceive, onerror)
+
+        def onreceive(result):
+            # self.creatorListView.hideLoading()
+            for k, v in result.items():
+                v['id'] = k
+                self.adminListView.addUser(v)
+                print(k, v)
+
+        connector.getAdminList(onreceive, onerror)
 
 
 app = QApplication(sys.argv)

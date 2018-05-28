@@ -109,6 +109,20 @@ def getCreatorList(onreceive, onerror):
     else:
         onerror()
 
+def getAdminList(onreceive, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/listalladmin/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+
+    print('getting admin list . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('get admin list result:', response.text)
+        onreceive(response.json())
+    else:
+        onerror()
+
 # add file
 def addFile(name, path, onsuccess, onfailed, onerror):
     url = 'http://17chuchu.pythonanywhere.com/SystemArt/addfile/'
@@ -236,10 +250,11 @@ if __name__ == '__main__':
     def onreceive(result):
         print('receive:', result)
 
+    getAdminList(onreceive, onerror)
     # getCreatorList(onreceive, onerror)
 
-    deleteFile("5f78475119f54e5ab87630bd519250ab", onsuccess, onerror)
     # deleteFile("7edf103680424da39a69ee6e9760152b", onsuccess, onerror)
+    # deleteFile("cc008eae97764193932d7fe930fceb35", onsuccess, onerror)
     getFileList(onreceive, onerror)
 
     def onsuccess(fileid):
@@ -247,6 +262,7 @@ if __name__ == '__main__':
 
     # addFile("folder 1", "1-0-folder 1", onsuccess, onfailed, onerror)
     # addFile("folder 2", "2-1-folder 2", onsuccess, onfailed, onerror)
+
     # addFile("c.png", "3-1-c.png", onsuccess, onfailed, onerror)
     # addFile("d.png", "4-2-d.png", onsuccess, onfailed, onerror)
     # addFile("e.png", "5-0-e.png", onsuccess, onfailed, onerror)
@@ -257,6 +273,6 @@ if __name__ == '__main__':
     # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "3", ".png", onsuccess, onfailed, onerror)
     # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "4", ".png", onsuccess, onfailed, onerror)
 
-    getVersionList("2159f1a2d7f048dfa186b44b32b77d28", onreceive, onerror)
+    # getVersionList("2159f1a2d7f048dfa186b44b32b77d28", onreceive, onerror)
     # getVersionList("2986c86deae34f9eb498bdf040fa808c", onreceive, onerror)
 
