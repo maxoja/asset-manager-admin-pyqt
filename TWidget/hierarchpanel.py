@@ -105,6 +105,7 @@ class HierarchyPanel(QScrollArea):
         self.model = model
         self.expanding = { i:False for i in self.model.getIds() }
         self.itemDict = dict()
+        self.onclickitem = self.__defaultOnClickItem
 
         self.setFixedWidth(self.fixedWidth)
         self.setMinimumHeight(self.minHeight)
@@ -137,7 +138,7 @@ class HierarchyPanel(QScrollArea):
             listItem = Item(childId, itemName, level=level, expandable=itemExpandable)
             if 'tip' in itemModel :
                 listItem.setToolTip(itemModel['tip'])
-            listItem.clicked.connect(self.__onClickItem)
+            listItem.clicked.connect(self.__onClickItemPlug)
             layout.addWidget(listItem)
             self.itemDict[childId] = listItem
 
@@ -188,11 +189,13 @@ class HierarchyPanel(QScrollArea):
                 self.__expandItem(childId, expanding)
                 childItem.hide()
 
-    def __onClickItem(self):
+    def __onClickItemPlug(self):
         for childId, child in self.itemDict.items() :
             if child != self.sender():
                 child.setHighlighted(False)
             else:
+                self.onclickitem(self.model.getItemOf(child.getId()))
+
                 if child.isHighlighted():
                     if child.isSelected():
                         child.setSelected(False)
@@ -202,6 +205,12 @@ class HierarchyPanel(QScrollArea):
                         child.arrow.onDown = lambda i=childId: self.__expandItem(i, True)
 
                 child.setHighlighted(True)
+
+    def setOnClickItem(self, onclick):
+        self.onclickitem = onclick
+
+    def __defaultOnClickItem(self, item):
+        print("clicked on ", item)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
