@@ -1,7 +1,8 @@
-from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel
+from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel, AssetViewWidget
 from TModel import HierarchicalModel
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
 from qtmodern import styles, windows
 import sys
 from TConnect import connector
@@ -76,10 +77,12 @@ class ManageAssetWindow(QWidget):
         [self.stepper.setSecondaryText('', i) for i in range(5)]
 
         # MID MID WIDGET
-        self.assetView = UserListView(keys=['id', 'name', 'email'])
-        self.assetView.setTitleText("Creator User List")
-        self.assetView.setIcon("img/artist-icon.png")
-        self.assetView.setOnSelectUser(self.__onClickCreator)
+        self.assetView = AssetViewWidget()
+        self.assetView.setPhoto(QPixmap('img/admin-icon.png'))
+        # self.assetView = UserListView(keys=['id', 'name', 'email'])
+        # self.assetView.setTitleText("Creator User List")
+        # self.assetView.setIcon("img/artist-icon.png")
+        # self.assetView.setOnSelectUser(self.__onClickCreator)
 
         # MID BOTTOM WIDGET
         self.assetOptionPanel = UserListView(keys=['id', 'name', 'email'])
@@ -120,16 +123,7 @@ class ManageAssetWindow(QWidget):
         print("__onClickAdmin called")
 
     def __initialize(self):
-        def onreceive(result):
-            for k, v in result.items():
-                v['id'] = k
-                self.assetView.addUser(v)
-                print(k, v)
-
-        def onerror():
-            print('get creator list error occurred')
-
-        connector.getCreatorList(onreceive, onerror)
+        pass
 
 
 app = QApplication(sys.argv)
