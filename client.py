@@ -1,9 +1,8 @@
 from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel, AssetViewWidget, AssetOptionPanel
 from TModel import HierarchicalModel
-from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout, QFileDialog
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from qtmodern import styles, windows
 import sys
 from TConnect import connector
 
@@ -59,6 +58,7 @@ class ManageAssetWindow(QWidget):
         [self.stepper.setSecondaryText('', i) for i in range(5)]
 
         # MID MID WIDGET
+        self.prevAsset = None
         self.assetView = AssetViewWidget()
         self.assetView.setPhoto(QPixmap('img/admin-icon.png'))
         # self.assetView = UserListView(keys=['id', 'name', 'email'])
@@ -177,8 +177,15 @@ class ManageAssetWindow(QWidget):
 
         # CREATE NEW ASSET
         def onCreateAsset():
-            # pop select file
-            self.assetOptionPanel.setMode(AssetOptionPanel.MODE_CONFIRM_CREATE)
+            filename = QFileDialog.getOpenFileName(self, "Choose image file", "", "Images(*.png)")
+            if filename[0]:
+                self.prevAsset = self.assetView.getCurrentOriginalPixmap()
+
+                self.assetView.setPhoto(QPixmap(filename[0]))
+                self.stepper.setVisible(False)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_CONFIRM_CREATE)
+            else:
+                print("no file selected")
 
         # CANCEL NEW FOLDER
         def onCancel():
@@ -186,9 +193,12 @@ class ManageAssetWindow(QWidget):
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
 
             elif self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_CONFIRM_CREATE:
+                self.stepper.setVisible(True)
+                self.assetView.setPhoto(self.prevAsset)
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
 
             elif self.assetOptionPanel.getCurrentMode() == AssetOptionPanel.MODE_CONFIRM_UPDATE:
+                self.stepper.setVisible(True)
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
 
         # CANCEL NEW ASSET
@@ -212,6 +222,8 @@ class ManageAssetWindow(QWidget):
             itemdict = self.hierarchy.getHighlightedDict()
             path = str(self.hierarchy.model.getNextId()) + '-' + str(item.getId()) + '-' + fname
             connector.addFile(fname, path, onsuccess, lambda x, y: print('erro', x, y), lambda: None)
+
+        
 
         self.assetOptionPanel.setOnClickDeleteFolder(onDeleteFolder)
         self.assetOptionPanel.setOnClickDeleteAsset(onDeleteAsset)
