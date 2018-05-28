@@ -132,8 +132,11 @@ class ManageAssetWindow(QWidget):
 
         def onclickitem(item):
             if item['isfile']:
+                self.stepper.setVisible(True)
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
             else:
+                self.stepper.setVisible(False)
+                self.assetView.setPhoto(None)
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
 
         self.hierarchy.setOnClickItem(onclickitem)
@@ -216,6 +219,8 @@ class ManageAssetWindow(QWidget):
 
             def onsuccess(result):
                 print('create folder success ', result)
+                self.assetView.setPhoto(None)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_NONE)
                 self.__fetchHierarchy()
 
             item = self.hierarchy.getHighlightedItem()
@@ -223,7 +228,25 @@ class ManageAssetWindow(QWidget):
             path = str(self.hierarchy.model.getNextId()) + '-' + str(item.getId()) + '-' + fname
             connector.addFile(fname, path, onsuccess, lambda x, y: print('erro', x, y), lambda: None)
 
-        
+        # CONFIRM NEW ASSET
+        def onConfirmNewAsset(fname):
+            fname = fname.replace('-', '')
+            fname = fname.replace('.', '')
+
+            if fname == '':
+                print("file name cant be empty")
+                return
+
+            def onsuccess(result):
+                print('create file success ', result)
+                self.assetView.setPhoto(None)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_NONE)
+                self.__fetchHierarchy()
+
+            item = self.hierarchy.getHighlightedItem()
+            itemdict = self.hierarchy.getHighlightedDict()
+            path = str(self.hierarchy.model.getNextId()) + '-' + str(item.getId()) + '-' + fname
+            connector.addFile(fname, path, onsuccess, lambda x, y: print('erro', x, y), lambda: None)
 
         self.assetOptionPanel.setOnClickDeleteFolder(onDeleteFolder)
         self.assetOptionPanel.setOnClickDeleteAsset(onDeleteAsset)
@@ -231,6 +254,7 @@ class ManageAssetWindow(QWidget):
         self.assetOptionPanel.setOnClickCreate(onCreateAsset)
         self.assetOptionPanel.setOnClickCancel(onCancel)
         self.assetOptionPanel.setOnClickConfirmNewFolder(onConfirmNewFolder)
+        self.assetOptionPanel.setOnClickConfirmCreate(onConfirmNewAsset)
 
 
     def __initialize(self):

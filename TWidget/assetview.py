@@ -52,7 +52,7 @@ class AssetViewWidget(QtWidgets.QGraphicsView):
         else:
             self._empty = True
             self.setDragMode(QtWidgets.QGraphicsView.NoDrag)
-            self._photo.setPixmap(QtCore.QPixmap())
+            self._photo.setPixmap(QtGui.QPixmap())
 
         self.fitInView()
 
