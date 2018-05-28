@@ -16,6 +16,7 @@ class StepperCheckpoint(QWidget):
     def __init__(self, id, area, visualSize, onClick, initState=STATE_PASSIVE):
         QWidget.__init__(self)
         self.id = id
+        self.data = None
         self.area = area
         self.visualSize = visualSize
         self.state = initState
@@ -35,11 +36,23 @@ class StepperCheckpoint(QWidget):
     def setOnClick(self, onClick):
         self.onClick = onClick
 
+    def setData(self, data):
+        self.data = data
+
+    def getData(self):
+        return self.data
+
     def setPrimaryText(self, text):
         self.primaryText = text
 
+    def getPrimaryText(self):
+        return self.primaryText
+
     def setSecondaryText(self, text):
         self.secondaryText = text
+
+    def getSecondaryText(self):
+        return self.secondaryText
 
     def setDrawParameters(self, x, area, visualSize):
         self.area = area
@@ -136,11 +149,23 @@ class StepperWidget(QWidget):
         for checkpoint in self.checkpoints.values():
             checkpoint.setOnClick(onClick)
 
+    def setData(self, data, id):
+        self.checkpoints[id].setData(data)
+
+    def getData(self, id):
+        return self.checkpoins[id].getData()
+
     def setPrimaryText(self, text, id):
         self.checkpoints[id].setPrimaryText(text)
 
+    def getPrimaryText(self, id):
+        return self.checkpoints[id].getPrimaryText()
+
     def setSecondaryText(self, text, id):
         self.checkpoints[id].setSecondaryText(text)
+
+    def getSecondaryText(self, id):
+        return self.checkpoints[id].getSecondaryText()
 
     def __calculateCheckpointArea(self):
         checkpointArea = self.width()/(self.numStep+1)

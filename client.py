@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitt
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 import sys
-from TConnect import connector
+from TConnect import connector, loader
 
 
 class ManageAssetWindow(QWidget):
@@ -105,15 +105,32 @@ class ManageAssetWindow(QWidget):
     def __onClickAdmin(self, admin):
         print("__onClickAdmin called")
 
+    def __fetchStepper(self):
+        fileid = self.hierarchy.getHighlightedDict()['fileid']
+
+        def onreceive(versionList):
+            print("getversion ", versionList)
+            #TODO
+            # self.stepper.setNodeNumber(len(versionList))
+            for i, ver in enumerate(versionList):
+                ver['fileid'] = fileid
+                self.stepper.setPrimaryText(ver['version'], i)
+                self.stepper.setData(ver, i)
+
+            self.stepper.setCurrentStep(self.stepper.numStep-1)
+
+        connector.getVersionList(fileid, onreceive, lambda : print("error getversion of",fileid))
+
+
     def __fetchHierarchy(self):
         def ongetfiles(files):
             print(files)
 
             tree = self.hierarchy.model
             if isinstance(tree, HierarchicalModel):
-
                 for i in tree.getIds():
                     tree.removeById(i)
+
 
             tree.add(0, name="root")
 
@@ -125,14 +142,15 @@ class ManageAssetWindow(QWidget):
                 filename = splittedpath[2]
                 isfile = '.' in filename
 
-                tree.add(selfid, parentid, name=filename, isfile=isfile, fileid=file['id'])
                 print(file)
+                tree.add(selfid, parentid, name=filename, isfile=isfile, fileid=file['id'])
 
             self.hierarchy.reconstruct(0)
 
         def onclickitem(item):
             if item['isfile']:
                 self.stepper.setVisible(True)
+                self.__fetchStepper()
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
             else:
                 self.stepper.setVisible(False)
@@ -182,6 +200,7 @@ class ManageAssetWindow(QWidget):
         def onCreateAsset():
             filename = QFileDialog.getOpenFileName(self, "Choose image file", "", "Images(*.png)")
             if filename[0]:
+                self.loadedAsset = filename[0]
                 self.prevAsset = self.assetView.getCurrentOriginalPixmap()
 
                 self.assetView.setPhoto(QPixmap(filename[0]))
@@ -231,17 +250,24 @@ class ManageAssetWindow(QWidget):
         # CONFIRM NEW ASSET
         def onConfirmNewAsset(fname):
             fname = fname.replace('-', '')
-            fname = fname.replace('.', '')
 
             if fname == '':
                 print("file name cant be empty")
                 return
 
-            def onsuccess(result):
-                print('create file success ', result)
-                self.assetView.setPhoto(None)
-                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_NONE)
-                self.__fetchHierarchy()
+            def onsuccess(fileid):
+                print('create file success ', fileid)
+                self.assetView.setPhoto(QPixmap(self.loadedAsset))
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+                self.stepper.setVisible(True)
+
+                def onaddedversion(uploadpath):
+                    loader.upload(uploadpath, self.loadedAsset)
+                    self.__fetchStepper()
+                    self.__fetchHierarchy()
+
+                connector.addVersion(fileid, '1', '.png', onaddedversion, lambda x,y:print("erro",x,y), lambda: None)
+
 
             item = self.hierarchy.getHighlightedItem()
             itemdict = self.hierarchy.getHighlightedDict()
@@ -258,6 +284,7 @@ class ManageAssetWindow(QWidget):
 
 
     def __initialize(self):
+        loader.init()
         self.__fetchHierarchy()
         self.__setupOptionPanel()
 

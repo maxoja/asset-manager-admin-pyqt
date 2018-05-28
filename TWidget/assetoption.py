@@ -143,13 +143,13 @@ class AssetOptionPanel(QWidget):
 
     # Delete Folder
     def setOnClickDeleteFolder(self, onclick):
-        self.onclickdeleteasset = onclick
+        self.onclickdeletefolder = onclick
 
     def __defaultOnClickDeleteFolder(self):
         print("click delete asset")
 
     def __onClickDeleteFolderPlug(self):
-        self.onclickdeleteasset()
+        self.onclickdeletefolder()
 
     # Cancel
     def setOnClickCancel(self, onclick):

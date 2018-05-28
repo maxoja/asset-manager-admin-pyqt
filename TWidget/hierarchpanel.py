@@ -195,20 +195,25 @@ class HierarchyPanel(QScrollArea):
         listItem.setSelected(expanding)
 
         for childId in self.model.getChildrenOf(id, getIdOnly=True):
-            childItem = self.itemDict[childId]
+            try:
+                childItem = self.itemDict[childId]
 
-            if expanding :
-                childItem.show()
-            else :
-                self.__expandItem(childId, expanding)
-                childItem.hide()
+                if expanding :
+                    childItem.show()
+                else :
+                    self.__expandItem(childId, expanding)
+                    childItem.hide()
+            except:
+                pass
 
     def __onClickItemPlug(self):
+        clickedItemId = -1
+
         for childId, child in self.itemDict.items() :
             if child != self.sender():
                 child.setHighlighted(False)
             else:
-                self.onclickitem(self.model.getItemOf(child.getId()))
+                clickedItemId = child.getId()
 
                 if child.isHighlighted():
                     if child.isSelected():
@@ -219,6 +224,8 @@ class HierarchyPanel(QScrollArea):
                         child.arrow.onDown = lambda i=childId: self.__expandItem(i, True)
 
                 child.setHighlighted(True)
+
+        self.onclickitem(self.model.getItemOf(clickedItemId))
 
     def setOnClickItem(self, onclick):
         self.onclickitem = onclick

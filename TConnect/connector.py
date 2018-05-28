@@ -143,6 +143,7 @@ def addVersion(fileid, version, filetype, onsuccess, onfailed, onerror):
     data['filetype'] = filetype
 
     print('add version . . .')
+    print('json =', data)
     response = requests.post(url, json=data)
 
     if response.ok:
@@ -152,7 +153,7 @@ def addVersion(fileid, version, filetype, onsuccess, onfailed, onerror):
         comment = result['comment']
 
         if tag == 0:
-            onsuccess(comment[-32:])
+            onsuccess(comment.split('#')[1])
         else:
             onfailed(tag, comment)
     else:
@@ -199,6 +200,22 @@ def getFileList(onreceive, onerror):
         onerror()
 
 # list all version of a file
+def getVersionList(fileid, onreceive, onerror):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/listallversionoffile/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['fileid'] = fileid
+
+    print('getting version list . . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('get version list result:', response.text)
+        versionDict = response.json()
+        versionList = [ versionDict[k] for k in versionDict ]
+        onreceive(versionList)
+    else:
+        onerror()
 
 if __name__ == '__main__':
     def onsuccess():
@@ -221,19 +238,25 @@ if __name__ == '__main__':
 
     # getCreatorList(onreceive, onerror)
 
-    deleteFile("bbdf054b455c4ddaa2c2b2510cf69ebd", onsuccess, onerror)
-    # deleteFile("bc926034601e43e1805e5573fd9fb2c8", onsuccess, onerror)
+    deleteFile("5f78475119f54e5ab87630bd519250ab", onsuccess, onerror)
+    # deleteFile("7edf103680424da39a69ee6e9760152b", onsuccess, onerror)
     getFileList(onreceive, onerror)
 
     def onsuccess(fileid):
         print("success add file", fileid)
 
     # addFile("folder 1", "1-0-folder 1", onsuccess, onfailed, onerror)
-    addFile("folder 2", "2-1-folder 2", onsuccess, onfailed, onerror)
+    # addFile("folder 2", "2-1-folder 2", onsuccess, onfailed, onerror)
     # addFile("c.png", "3-1-c.png", onsuccess, onfailed, onerror)
     # addFile("d.png", "4-2-d.png", onsuccess, onfailed, onerror)
     # addFile("e.png", "5-0-e.png", onsuccess, onfailed, onerror)
     # addFile("f.png", "6-0-f.png", onsuccess, onfailed, onerror)
 
-    # addVersion("7edf103680424da39a69ee6e9760152b", "1.1", ".png", onsuccess, onfailed, onerror)
+    # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "1", ".png", onsuccess, onfailed, onerror)
+    # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "2", ".png", onsuccess, onfailed, onerror)
+    # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "3", ".png", onsuccess, onfailed, onerror)
+    # addVersion("2159f1a2d7f048dfa186b44b32b77d28", "4", ".png", onsuccess, onfailed, onerror)
+
+    getVersionList("2159f1a2d7f048dfa186b44b32b77d28", onreceive, onerror)
+    # getVersionList("2986c86deae34f9eb498bdf040fa808c", onreceive, onerror)
 
