@@ -1,9 +1,9 @@
 # asset-manager-admin-pyqt
 
 ## todo
+- center screen windows
 - fetch delay transition
 - put things together
-- add title on EditPanel
 
 ## EditPanel
 - addEditRow( key:str, widgetType:class )

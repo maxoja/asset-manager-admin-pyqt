@@ -1,6 +1,11 @@
 from PyQt5.QtWidgets import QDialog, QApplication, QLineEdit, QPushButton, QLabel, QDesktopWidget
 from PyQt5.QtWidgets import QVBoxLayout, QMessageBox, QWidget, QFormLayout, QLayout
 from PyQt5.QtCore import Qt, QPoint
+from qtmodern import styles, windows
+from TConnect import connector
+# from TWidget import LoadingFilter
+
+
 
 class LoginDialog(QDialog):
     def __init__(self, parent=None):
@@ -11,10 +16,10 @@ class LoginDialog(QDialog):
         centerPoint = QDesktopWidget().availableGeometry().center()
         self.move(centerPoint.x()-self.width()/2, centerPoint.y()-self.height()/2)
 
-        self.verification = lambda user, password: user == '' and password == ''
-
         self.textName = QLineEdit(self)
+        # self.textName.setMinimumWidth(150)
         self.textPass = QLineEdit(self)
+        # self.textPass.setMinimumWidth(200)
         self.textPass.setEchoMode(QLineEdit.Password)
 
         self.buttonLogin = QPushButton('Authenticate')
@@ -22,6 +27,7 @@ class LoginDialog(QDialog):
 
         layout = QVBoxLayout(self)
         form = QFormLayout()
+        form.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
         form.addRow('Username', self.textName)
         form.addRow('Password', self.textPass)
         form.addWidget(self.buttonLogin)
@@ -30,23 +36,47 @@ class LoginDialog(QDialog):
         layout.setSpacing(20)
         layout.setContentsMargins(20, 20, 20, 20)
 
-    def setVerification(self, verification):
-        self.verification = verification
+        self.textName.setText("admin")
+        self.textPass.setText("1234")
+        # self.__handleLogin()
+        # self.loadingFilter = LoadingFilter(self)
+
+    # def showloading(self):
+    #     self.loadingFilter.show()
+    #
+    # def hideloading(self):
+    #     self.loadingFilter.hide()
 
     def __handleLogin(self):
-        if self.verification(self.textName.text(), self.textPass.text()):
+        def onsuccess():
+            print('login success:', connector.getUserID(), connector.getAuthToken())
             self.accept()
             self.close()
-        else:
+
+        def onfailed(tag, comment):
+            print('login failed:', tag, comment)
+            # self.loadingFilter.hideLoading()
             warningDialog = InvalidDialog()
             mwarning = windows.ModernWindow(warningDialog)
             mwarning.show()
             warningDialog.exec_()
 
+        def onerror():
+            print('login error')
+            # self.loadingFilter.hideLoading()
+            warningDialog = ErrorDialog()
+            mwarning = windows.ModernWindow(warningDialog)
+            mwarning.show()
+            warningDialog.exec_()
+
+        # self.loadingFilter.showLoading()
+        connector.login(self.textName.text(), self.textPass.text(), onsuccess, onfailed, onerror)
+
+
 class InvalidDialog(QDialog):
     def __init__(self):
         QDialog.__init__(self)
-        self.setWindowTitle("Auth Error")
+        self.setWindowTitle("Auth Failed")
         self.setFixedSize(180, 70)
         centerPoint = QDesktopWidget().availableGeometry().center()
         self.move(centerPoint.x()+250-self.width()/2, centerPoint.y()-self.height()/2)
@@ -65,6 +95,27 @@ class InvalidDialog(QDialog):
         self.close()
 
 
+class ErrorDialog(QDialog):
+    def __init__(self):
+        QDialog.__init__(self)
+        self.setWindowTitle("Auth Error")
+        self.setFixedSize(180, 70)
+        centerPoint = QDesktopWidget().availableGeometry().center()
+        self.move(centerPoint.x()+250-self.width()/2, centerPoint.y()-self.height()/2)
+
+        self.warningLabel = QLabel('A connection error occurred, please try again')
+        self.okButton = QPushButton('Ok')
+        self.okButton.clicked.connect(self.onClick)
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.warningLabel)
+        layout.addWidget(self.okButton)
+        layout.setAlignment(Qt.AlignCenter)
+
+    def onClick(self):
+        self.accept()
+        self.close()
+
 if __name__ == '__main__':
     import sys
     from qtmodern import styles, windows
@@ -72,11 +123,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     styles.dark(app)
 
-    def verification(u, p):
-        return u == 'tawan' and p == 'tham'
-
     dialog = LoginDialog()
-    dialog.setVerification(verification)
     mdialog = windows.ModernWindow(dialog)
     mdialog.show()
     loginResult = dialog.exec_()
