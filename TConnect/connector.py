@@ -251,6 +251,7 @@ def getVersionList(fileid, onreceive, onerror):
     else:
         onerror()
 
+# edit user
 def editUser(id, name, username, password, email, onsuccess, onerror):
     url = 'http://17chuchu.pythonanywhere.com/SystemArt/edituserinfo/'
     data = {}
@@ -276,6 +277,56 @@ def editUser(id, name, username, password, email, onsuccess, onerror):
         print(response.text)
         onerror()
 
+# LIST COMMENT
+def getCommentList(fileid, version, onreceive, onerror= lambda:print('error list comment')):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/listallcomment/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['fileid'] = fileid
+    data['version'] = version
+
+    print('getting comment list of ', fileid, version, '. . .')
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('get comment list result:', response.text)
+        fileDict = response.json()
+        if 'tag' in fileDict:
+            onreceive([])
+            return
+
+        fileList = [fileDict[k] for k in fileDict]
+        for f, i in zip(fileList, fileDict.keys()): f['id'] = i
+        onreceive(fileList)
+    else:
+        # print(response.text)
+        onerror()
+
+def addcomment(fileid, version, comment, onsuccess, onerror=lambda:print("error add comment")):
+    url = 'http://17chuchu.pythonanywhere.com/SystemArt/addcomment/'
+    data = {}
+    data['authtoken'] = getAuthToken()
+    data['fileid'] = fileid
+    data['version'] = version
+    data['comment'] = comment
+
+    print('add comment . . .', fileid, version, comment)
+    print('json =', data)
+    response = requests.post(url, json=data)
+
+    if response.ok:
+        print('add comment result:', response.text)
+        result = response.json()
+        tag = result['tag']
+        comment = result['comment']
+
+        if tag == 0:
+            onsuccess(comment)
+        else:
+            onerror()
+    else:
+        print(response.text)
+        onerror()
 
 if __name__ == '__main__':
     def onsuccess():
@@ -292,6 +343,7 @@ if __name__ == '__main__':
     # createCreator('saitama', 'sait3do*!*o', '', 'sai3.com', onsuccess, onfailed, onerror)
 
     # createAdmin(getAuthToken(), 'Tawan Thampipattanakul', 'tawan', '1234', 'tawan.tpptnk@gmail.com', onsuccess, onfailed, onerror)
+
 
     def onreceive(result):
         print('receive:', result)
@@ -321,4 +373,9 @@ if __name__ == '__main__':
 
     # getVersionList("2159f1a2d7f048dfa186b44b32b77d28", onreceive, onerror)
     # getVersionList("2986c86deae34f9eb498bdf040fa808c", onreceive, onerror)
+
+    # addcomment("9fced8b5f63f44e2ace3a5e9a9cd9816","1","test comment 2",onsuccess)
+    getCommentList("9fced8b5f63f44e2ace3a5e9a9cd9816","1", onreceive)
+
+
 

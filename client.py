@@ -1,7 +1,7 @@
 from TWidget import LoginDialog, UserListView, EditPanel, HierarchyPanel, StepperWidget, CommentPanel, AssetViewWidget, AssetOptionPanel
 from TModel import HierarchicalModel
 from PyQt5.QtWidgets import QApplication, QDialog, QWidget, QHBoxLayout, QSplitter, QLineEdit, QTextEdit, QVBoxLayout, QFileDialog
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QPixmap
 import sys
 from TConnect import connector, loader
@@ -22,25 +22,7 @@ class ManageAssetWindow(QWidget):
 
         # RIGHT WIDGET
         self.commentPanel = CommentPanel()
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
-        self.commentPanel.addComment(title="comment 1", owner="maxoja", time="8:52 PM 27/05/18")
+        self.commentPanel.fieldArea.disable()
         self.commentPanel.setMaximumWidth(260)
 
         # MID TOP WIDGET
@@ -88,6 +70,23 @@ class ManageAssetWindow(QWidget):
     def __onClickAdmin(self, admin):
         print("__onClickAdmin called")
 
+
+    def __fetchCommentPanel(self, fileid, version):
+        def onreceivecomment(comments):
+            self.commentPanel.clearAll()
+            self.commentPanel.fieldArea.clearAll()
+
+            for comment in comments:
+                splitted = comment['comment'].split('`')
+                title = splitted[0]
+                details = splitted[1]
+                xy = splitted[2]
+                self.commentPanel.addComment(title=title, details=details, xy=xy)
+
+            self.commentPanel.fieldArea.enable()
+
+        connector.getCommentList(fileid, version, onreceivecomment)
+
     def __fetchStepper(self, fid=None):
         def onclickstep(stepid):
             if stepid == self.stepper.numStep-1 :
@@ -102,6 +101,8 @@ class ManageAssetWindow(QWidget):
 
             loader.download(firebasepath, 'temp.png')
             self.assetView.setPhoto(QPixmap('temp.png'))
+
+            self.__fetchCommentPanel(fileid, str(stepid+1))
 
         if fid is not None:
             fileid = fid
@@ -124,10 +125,9 @@ class ManageAssetWindow(QWidget):
             self.stepper.setCurrentStep(self.stepper.numStep-2)
 
         connector.getVersionList(fileid, onreceive, lambda : print("error getversion of",fileid))
+        self.__fetchCommentPanel(fileid, str(self.stepper.numStep-1))
 
         self.stepper.setOnClickCheckpoint(onclickstep)
-
-
 
     def __fetchHierarchy(self):
         def ongetfiles(files):
@@ -162,6 +162,7 @@ class ManageAssetWindow(QWidget):
             else:
                 self.stepper.setVisible(False)
                 self.assetView.setPhoto(QPixmap('img/cant-show.png'))
+                self.commentPanel.fieldArea.disable()
                 self.assetOptionPanel.setMode(AssetOptionPanel.MODE_FOLDER)
 
         self.hierarchy.setOnClickItem(onclickitem)
@@ -171,6 +172,9 @@ class ManageAssetWindow(QWidget):
         # DELETE FOLDER
         def onsuccessdeletefolder():
             self.__fetchHierarchy()
+            self.stepper.setVisible(False)
+            self.assetOptionPanel.setMode(AssetOptionPanel.MODE_NONE)
+            self.assetView.setPhoto(QPixmap('cant-show.png'))
 
         def onDeleteFolder():
             model = self.hierarchy.model
@@ -269,7 +273,7 @@ class ManageAssetWindow(QWidget):
             def onsuccess(fileid):
                 print('create file success ', fileid)
                 self.assetView.setPhoto(QPixmap(self.loadedAsset))
-                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_VIEW_ASSET)
+                self.assetOptionPanel.setMode(AssetOptionPanel.MODE_NONE)
                 self.stepper.setVisible(True)
 
                 def onaddedversion(uploadpath):
@@ -308,6 +312,20 @@ class ManageAssetWindow(QWidget):
             else:
                 print("no file selected")
 
+        # ADD COMMENT
+        def onClickAddComment(title, details):
+            if title == '':
+                return
+
+            comment = title+'`'+details+'`'+str(self.assetView.currentRegion)
+            fileid = self.hierarchy.getHighlightedDict()['fileid']
+            version = str(self.stepper.currentStep+1)
+
+            def onsuccess(comment):
+                self.__fetchCommentPanel(fileid, version)
+
+            connector.addcomment(fileid, version, comment, onsuccess)
+
         self.assetOptionPanel.setOnClickDeleteFolder(onDeleteFolder)
         self.assetOptionPanel.setOnClickDeleteAsset(onDeleteAsset)
         self.assetOptionPanel.setOnClickCreateFolder(onCreateFolder)
@@ -317,6 +335,16 @@ class ManageAssetWindow(QWidget):
         self.assetOptionPanel.setOnClickConfirmCreate(onConfirmNewAsset)
         self.assetOptionPanel.setOnClickConfirmUpdate(onConfirmUpdate)
         self.assetOptionPanel.setOnClickUpdate(onUpdateAsset)
+        self.commentPanel.setOnClickAdd(onClickAddComment)
+
+        def onclickcomment(comment):
+            coor = eval(comment['xy'])
+            if len(coor) == 2:
+                self.assetView.showRegion(QRect(coor[0], coor[1], coor[0], coor[1]))
+            else:
+                self.assetView.showRegion(QRect(coor[0], coor[1], coor[2], coor[3]))
+
+        self.commentPanel.setOnClickComment(onclickcomment)
 
 
     def __initialize(self):

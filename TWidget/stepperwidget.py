@@ -529,7 +529,6 @@ class StepperWidget(QWidget):
 
     def setOnClickCheckpoint(self, onClick):
         for checkpoint in self.checkpoints.values():
-            print('set new onclick')
             checkpoint.setOnClick(onClick)
 
     def setData(self, data, id):

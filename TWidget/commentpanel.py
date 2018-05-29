@@ -25,7 +25,11 @@ class CommentItem(QPushButton):
         titleLabel.setFont(titleFont)
 
         ownerFont = QFont("", 10, QFont.Thin)
-        ownerLabel = QLabel("by:" + self.model['owner'] + " - " + self.model['time'])
+        if 'owner' not in self.model or 'time' not in self.model:
+            ownerLabel = QLabel("")
+        else:
+            ownerLabel = QLabel("by:" + self.model['owner'] + " - " + self.model['time'])
+
         ownerLabel.setFont(ownerFont)
 
         layout.addWidget(titleLabel)
@@ -46,7 +50,9 @@ class CommentItem(QPushButton):
                     w.setMinimumHeight(150)
                     if w.layout().count() < 2:
                         label = QLabel(str(self.model))
+                        label.setAlignment(Qt.AlignTop)
                         label.setWordWrap(True)
+                        label.setFixedHeight(150)
                         w.layout().addWidget(label)
                 else:
                     w.setMinimumHeight(50)
@@ -120,12 +126,19 @@ class CommentPanel(QWidget):
         self.updateGeometry()
 
     def clearAll(self):
+        print("clear all comments from panel")
         layout = self.commentLayout
         while layout.count() > 0:
-            layout.removeItem(layout.itemAt(layout.count()-1))
+            it = layout.itemAt(layout.count()-1)
+            layout.removeItem(it)
+
+            if isinstance(it.widget(), CommentItem):
+                it.widget().setParent(None)
 
         layout.addStretch(0)
         self.comments.clear()
+
+        print(layout.count())
 
 
 class AddCommentArea(QWidget):
@@ -147,6 +160,16 @@ class AddCommentArea(QWidget):
         layout.addWidget(self.titleField)
         layout.addWidget(self.detailField)
         layout.addWidget(self.addButton)
+
+    def disable(self):
+        self.addButton.setDisabled(True)
+
+    def enable(self):
+        self.addButton.setEnabled(True)
+
+    def clearAll(self):
+        self.titleField.setText("")
+        self.detailField.setText("")
 
     def __onclickadd(self):
         self.onclickadd(self.titleField.text(), self.detailField.toPlainText())

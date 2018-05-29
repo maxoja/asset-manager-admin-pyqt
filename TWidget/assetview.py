@@ -20,6 +20,8 @@ class AssetViewWidget(QtWidgets.QGraphicsView):
         self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.setBackgroundBrush(QtGui.QBrush(QtGui.QColor(30, 30, 30)))
         self.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.clicks = []
+        self.currentRegion = (0, 0, 0, 0)
 
     def hasPhoto(self):
         return not self._empty
@@ -31,6 +33,7 @@ class AssetViewWidget(QtWidgets.QGraphicsView):
             if self.hasPhoto():
                 unity = self.transform().mapRect(QtCore.QRectF(0, 0, 1, 1))
                 self.scale(1 / unity.width(), 1 / unity.height())
+
                 viewrect = self.viewport().rect()
                 scenerect = self.transform().mapRect(rect)
                 factor = min(viewrect.width() / scenerect.width(),
@@ -80,12 +83,36 @@ class AssetViewWidget(QtWidgets.QGraphicsView):
     def mousePressEvent(self, event):
         if self._photo.isUnderMouse():
             self.photoClicked.emit(QtCore.QPoint(event.pos()))
+            print(event.pos())
+
+            if len(self.clicks) >= 2:
+                self.setPhoto(self.originalPixmap)
+                self.currentRegion = (0,0,0,0)
+                self.clicks.clear()
+            else:
+
+                rect = QtCore.QRectF(self._photo.pixmap().rect())
+                viewrect = self.viewport().rect()
+                scenerect = self.transform().mapRect(rect)
+                factor = min(scenerect.width() / rect.width(),
+                             scenerect.height() / rect.height())
+                # factor = min(viewrect.width() / rect.width(),
+                #              viewrect.height() / rect.height())
+
+                print(factor)
+
+                self.clicks.append((event.pos().x()/factor, event.pos().y()/factor))
+                if len(self.clicks) == 2:
+                    print(self.clicks)
+                    self.showRegion(QtCore.QRect(self.clicks[0][0], self.clicks[0][1], self.clicks[1][0], self.clicks[1][1]))
+
         super(AssetViewWidget, self).mousePressEvent(event)
 
     def showRegion(self, rect):
         if not isinstance(rect, QtCore.QRect):
             assert False
 
+        self.currentRegion = (rect.left(), rect.top(), rect.width(), rect.height())
         newpix = QtGui.QPixmap(self.originalPixmap)
 
         # brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
@@ -94,10 +121,10 @@ class AssetViewWidget(QtWidgets.QGraphicsView):
         painter = QtGui.QPainter(newpix)
         # painter.setBrush(brush)
         painter.setPen(pen)
-        painter.drawLine(rect.left(), rect.top(), rect.right(), rect.top() )
-        painter.drawLine(rect.right(), rect.top(), rect.right(), rect.bottom())
-        painter.drawLine(rect.right(), rect.bottom(), rect.left(), rect.bottom())
-        painter.drawLine(rect.left(), rect.bottom(), rect.left(), rect.top())
+        painter.drawLine(rect.left(), rect.top(), rect.width(), rect.top() )
+        painter.drawLine(rect.width(), rect.top(), rect.width(), rect.height())
+        painter.drawLine(rect.width(), rect.height(), rect.left(), rect.height())
+        painter.drawLine(rect.left(), rect.height(), rect.left(), rect.top())
         painter.end()
         self._photo.setPixmap(newpix)
 
